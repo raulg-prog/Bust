@@ -5,8 +5,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
 bg_color = Color(0.31, 0.239, 0.565, 1)
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_sd3cb"]
-load_path = "res://.godot/imported/Asset 1 wheel.png-29f10a467f050ddf54880c198d254215.ctex"
+[ext_resource type="Texture2D" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
 
 [node name="Wheel" type="Control" unique_id=2089672270]
 layout_mode = 3
@@ -77,21 +76,19 @@ size_flags_horizontal = 4
 [node name="WheelImage" type="TextureRect" parent="Center/GameArea/WheelArea" unique_id=241665528]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -84.0
-offset_top = 1.0
-offset_right = 484.0
-offset_bottom = 569.0
-texture = SubResource("CompressedTexture2D_sd3cb")
+offset_right = 400.0
+offset_bottom = 400.0
+texture = ExtResource("2_wheel_tex")
+expand_mode = 0
 stretch_mode = 5
 
 [node name="PivotMarker" type="Control" parent="Center/GameArea/WheelArea" unique_id=100000001]
 unique_name_in_owner = true
 layout_mode = 0
-anchors_preset = 0
-offset_left = 193.0
-offset_top = 251.0
-offset_right = 208.0
-offset_bottom = 266.0
+offset_left = 188.0
+offset_top = 188.0
+offset_right = 212.0
+offset_bottom = 212.0
 mouse_filter = 2
 
 [node name="PointerLabel" type="Label" parent="Center/GameArea/WheelArea" unique_id=627949456]
