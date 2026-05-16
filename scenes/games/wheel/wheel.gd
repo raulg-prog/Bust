@@ -45,9 +45,11 @@ var current_bet : float = 0.0
 
 func _ready() -> void:
 	spin_btn.pressed.connect(_on_spin)
-	# Wait one frame so layout is computed, then set pivot to image center
+	# Wait one frame for layout, then pin the pivot to the WheelArea center.
+	# Using parent size (not image size) so editor anchor drift can't throw it off.
 	await get_tree().process_frame
-	wheel_image.pivot_offset = wheel_image.size / 2.0
+	var area: Control = wheel_image.get_parent()
+	wheel_image.pivot_offset = area.size / 2.0 - wheel_image.position
 	_update_hud()
 
 
