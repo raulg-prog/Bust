@@ -5,3 +5,11 @@
 [resource]
 default_font = ExtResource("1_font")
 default_font_size = 16
+Button/fonts/font = ExtResource("1_font")
+Button/font_sizes/font_size = 16
+Label/fonts/font = ExtResource("1_font")
+Label/font_sizes/font_size = 16
+LineEdit/fonts/font = ExtResource("1_font")
+LineEdit/font_sizes/font_size = 16
+RichTextLabel/fonts/normal_font = ExtResource("1_font")
+RichTextLabel/font_sizes/normal_font_size = 16

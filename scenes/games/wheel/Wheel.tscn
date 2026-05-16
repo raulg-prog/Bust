@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dgb53iblx6v41"]
 
 [ext_resource type="Script" uid="uid://37x442eh4ach" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
-[ext_resource type="Texture2D" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
+[ext_resource type="Texture2D" uid="uid://bm8tw4hnrdpop" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
 bg_color = Color(0.31, 0.239, 0.565, 1)
@@ -38,10 +38,10 @@ theme_override_constants/separation = 14
 
 [node name="TitleLabel" type="Label" parent="Center/GameArea" unique_id=376177336]
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_font_sizes/font_size = 26
 text = "★  WHEEL  ★"
+horizontal_alignment = 1
 
 [node name="TitleDivider" type="PanelContainer" parent="Center/GameArea" unique_id=576078889]
 custom_minimum_size = Vector2(0, 2)
@@ -55,17 +55,17 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 20
 text = "Balance:  $1,000"
 
 [node name="FameLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=1814143620]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.5, 0.78, 1, 1)
+theme_override_font_sizes/font_size = 20
 text = "0 / 25,000 Fame"
+horizontal_alignment = 2
 
 [node name="WheelArea" type="Control" parent="Center/GameArea" unique_id=741984272]
 custom_minimum_size = Vector2(400, 400)
@@ -75,19 +75,18 @@ size_flags_horizontal = 4
 [node name="WheelImage" type="TextureRect" parent="Center/GameArea/WheelArea" unique_id=241665528]
 unique_name_in_owner = true
 layout_mode = 0
-offset_right = 400.0
-offset_bottom = 400.0
+offset_right = 517.0
+offset_bottom = 515.0
 texture = ExtResource("2_wheel_tex")
-expand_mode = 0
 stretch_mode = 5
 
 [node name="PivotMarker" type="Control" parent="Center/GameArea/WheelArea" unique_id=100000001]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 188.0
-offset_top = 188.0
-offset_right = 212.0
-offset_bottom = 212.0
+anchors_preset = 0
+offset_left = 254.0
+offset_top = 254.0
+offset_right = 259.0
+offset_bottom = 259.0
 mouse_filter = 2
 
 [node name="PointerLabel" type="Label" parent="Center/GameArea/WheelArea" unique_id=627949456]
@@ -100,16 +99,16 @@ offset_top = 2.0
 offset_right = 8.0
 offset_bottom = 22.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_font_sizes/font_size = 20
 text = "▼"
 
 [node name="ResultLabel" type="Label" parent="Center/GameArea" unique_id=1418590153]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 0.45, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
 
 [node name="BetRow" type="HBoxContainer" parent="Center/GameArea" unique_id=1063357964]
 layout_mode = 2
@@ -117,8 +116,8 @@ theme_override_constants/separation = 10
 
 [node name="BetLabel" type="Label" parent="Center/GameArea/BetRow" unique_id=1978704737]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.65, 0.65, 0.78, 1)
+theme_override_font_sizes/font_size = 20
 text = "Bet:  $"
 vertical_alignment = 1
 
