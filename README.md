@@ -74,11 +74,22 @@ Bust/
 
 ---
 
+## Getting Claude Up to Speed
+
+This repo includes a `CLAUDE.md` with full project context — design pillars, code conventions, implemented systems, and the visual style guide. After cloning or pulling, tell Claude:
+
+> "Please read CLAUDE.md and use it as context for this project."
+
+Claude Code will load it automatically, but explicitly asking ensures it's fully digested before you start working.
+
+---
+
 ## Contributing
 
 1. Pull latest before starting work: `git pull origin main`
-2. Make your changes
-3. Commit with a clear message describing what and why
-4. Push: `git push origin main`
+2. Ask Claude to read `CLAUDE.md` so it's on the same page
+3. Make your changes
+4. Commit with a clear message describing what and why
+5. Push: `git push origin main`
 
 Avoid committing the `.godot/` folder — it's gitignored since it's generated locally.
