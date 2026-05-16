@@ -103,7 +103,8 @@ func _build_strip() -> void:
 		lbl.size_flags_vertical       = Control.SIZE_SHRINK_CENTER
 		lbl.add_theme_color_override("font_color", Color(1, 1, 1))
 		lbl.add_theme_font_size_override("font_size", 14)
-		lbl.text = "✕" if seg[0] == 0.0 else ("%.4gx" % seg[0])
+		var m: float = seg[0]
+		lbl.text = "✕" if m == 0.0 else ("%dx" % int(m) if m == int(m) else "%.1fx" % m)
 		panel.add_child(lbl)
 		segment_strip.add_child(panel)
 
@@ -149,7 +150,8 @@ func _on_spin_complete(mult: float) -> void:
 		var profit := current_bet * (mult - 1.0)
 		GameState.bankroll += profit
 		GameState.add_fame(TOWN_ID, profit)
-		result_label.text = "+$%s  (%.4gx)" % [_fmt(profit), mult]
+		var mult_str := "%dx" % int(mult) if mult == int(mult) else "%.1fx" % mult
+		result_label.text = "+$%s  (%s)" % [_fmt(profit), mult_str]
 
 	state             = State.IDLE
 	spin_btn.disabled = false
