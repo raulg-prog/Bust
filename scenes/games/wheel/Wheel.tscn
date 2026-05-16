@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://dgb53iblx6v41"]
 
 [ext_resource type="Script" uid="uid://37x442eh4ach" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
+[ext_resource type="Texture2D" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
 bg_color = Color(0.31, 0.239, 0.565, 1)
-
-[ext_resource type="Texture2D" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
 
 [node name="Wheel" type="Control" unique_id=2089672270]
 layout_mode = 3
