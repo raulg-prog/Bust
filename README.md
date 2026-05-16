@@ -1,4 +1,4 @@
-# Lucky Streak
+# Bust
 
 A GBA/DS Pokémon-inspired top-down adventure RPG with gambling-based progression, built in Godot 4.6.
 
