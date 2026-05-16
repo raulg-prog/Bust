@@ -101,6 +101,15 @@ texture = SubResource("CompressedTexture2D_sd3cb")
 expand_mode = 0
 stretch_mode = 5
 
+[node name="PivotMarker" type="Control" parent="Center/GameWindow/GameMargin/GameArea/WheelArea" unique_id=100000001]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 188.0
+offset_top = 188.0
+offset_right = 212.0
+offset_bottom = 212.0
+mouse_filter = 2
+
 [node name="PointerLabel" type="Label" parent="Center/GameWindow/GameMargin/GameArea/WheelArea" unique_id=627949456]
 layout_mode = 1
 anchors_preset = 5

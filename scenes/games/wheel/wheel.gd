@@ -41,15 +41,17 @@ var current_bet : float = 0.0
 @onready var bet_input     : LineEdit    = %BetInput
 @onready var spin_btn      : Button      = %SpinButton
 @onready var wheel_image   : TextureRect = %WheelImage
+@onready var pivot_marker  : Control     = %PivotMarker
 
 
 func _ready() -> void:
 	spin_btn.pressed.connect(_on_spin)
-	# Wait one frame for layout, then pin the pivot to the WheelArea center.
-	# Using parent size (not image size) so editor anchor drift can't throw it off.
 	await get_tree().process_frame
-	var area: Control = wheel_image.get_parent()
-	wheel_image.pivot_offset = area.size / 2.0 - wheel_image.position
+	# Pivot is the center of PivotMarker, expressed in WheelImage's local space.
+	# Drag PivotMarker in the editor until it sits on the wheel hub, then it's exact.
+	var hub := pivot_marker.position + pivot_marker.size / 2.0
+	wheel_image.pivot_offset = hub - wheel_image.position
+	pivot_marker.hide()
 	_update_hud()
 
 
