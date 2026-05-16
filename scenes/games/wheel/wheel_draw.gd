@@ -26,7 +26,7 @@ func _draw() -> void:
 		return
 
 	var center  := size / 2.0
-	var radius  := min(size.x, size.y) / 2.0
+	var radius  := minf(size.x, size.y) / 2.0
 	var inner_r := radius - RIM_THICK
 	var n       := segments.size()
 	var arc     := TAU / n
