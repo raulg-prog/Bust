@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
+[ext_resource type="Script" path="res://scenes/games/wheel/wheel_draw.gd" id="2_draw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_window"]
 bg_color = Color(0.067, 0.047, 0.157, 1)
@@ -13,8 +14,8 @@ border_color = Color(0.31, 0.239, 0.565, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
 bg_color = Color(0.31, 0.239, 0.565, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
-bg_color = Color(0.027, 0.020, 0.078, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_spin"]
+bg_color = Color(0.12, 0.08, 0.25, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -49,15 +50,15 @@ grow_vertical = 2
 
 [node name="GameWindow" type="PanelContainer" parent="Center"]
 layout_mode = 2
-custom_minimum_size = Vector2(520, 0)
+custom_minimum_size = Vector2(560, 0)
 theme_override_styles/panel = SubResource("StyleBoxFlat_window")
 
 [node name="GameMargin" type="MarginContainer" parent="Center/GameWindow"]
 layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_bottom = 14
 
 [node name="GameArea" type="VBoxContainer" parent="Center/GameWindow/GameMargin"]
 layout_mode = 2
@@ -66,7 +67,7 @@ theme_override_constants/separation = 10
 [node name="TitleLabel" type="Label" parent="Center/GameWindow/GameMargin/GameArea"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
 text = "★  WHEEL  ★"
 
@@ -92,36 +93,59 @@ horizontal_alignment = 2
 theme_override_colors/font_color = Color(0.5, 0.78, 1.0, 1)
 text = "0 / 25,000 Fame"
 
-[node name="PointerLabel" type="Label" parent="Center/GameWindow/GameMargin/GameArea"]
+[node name="WheelArea" type="Control" parent="Center/GameWindow/GameMargin/GameArea"]
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 14
+custom_minimum_size = Vector2(0, 380)
+
+[node name="WheelDraw" type="Control" parent="Center/GameWindow/GameMargin/GameArea/WheelArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_draw")
+
+[node name="WheelOverlay" type="Control" parent="Center/GameWindow/GameMargin/GameArea/WheelArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PointerLabel" type="Label" parent="Center/GameWindow/GameMargin/GameArea/WheelArea/WheelOverlay"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -8.0
+offset_top = 4.0
+offset_right = 8.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
 text = "▼"
 
-[node name="WheelFrame" type="PanelContainer" parent="Center/GameWindow/GameMargin/GameArea"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 64)
-theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
-
-[node name="WheelFrameMargin" type="MarginContainer" parent="Center/GameWindow/GameMargin/GameArea/WheelFrame"]
-layout_mode = 2
-theme_override_constants/margin_left = 2
-theme_override_constants/margin_right = 2
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_bottom = 2
-
-[node name="WheelClip" type="Control" parent="Center/GameWindow/GameMargin/GameArea/WheelFrame/WheelFrameMargin"]
+[node name="SpinButton" type="Button" parent="Center/GameWindow/GameMargin/GameArea/WheelArea/WheelOverlay"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-clip_children = 1
-
-[node name="SegmentStrip" type="HBoxContainer" parent="Center/GameWindow/GameMargin/GameArea/WheelFrame/WheelFrameMargin/WheelClip"]
-unique_name_in_owner = true
-layout_mode = 0
-theme_override_constants/separation = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -16.0
+offset_right = 32.0
+offset_bottom = 16.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_spin")
+theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
+text = "SPIN"
 
 [node name="RiskRow" type="HBoxContainer" parent="Center/GameWindow/GameMargin/GameArea"]
 layout_mode = 2
@@ -167,12 +191,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(100, 0)
 text = "100"
 placeholder_text = "Amount"
-
-[node name="SpinButton" type="Button" parent="Center/GameWindow/GameMargin/GameArea/BetRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "SPIN"
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 3
