@@ -69,6 +69,8 @@ Bust/
 │   ├── Cards/
 │   │   ├── 1.2 Poker cards.png     # Full card spritesheet (944×385px)
 │   │   └── minicards.png           # History strip cards (433×160px)
+│   ├── Fonts/
+│   │   └── m5x7.ttf                # Global pixel font (GBA style)
 │   └── Floor TIles/                # Tileset assets (not yet wired up)
 ├── autoloads/
 │   └── game_state.gd               # Global singleton
@@ -77,9 +79,14 @@ Bust/
 │       ├── hilo/
 │       │   ├── HiLo.tscn
 │       │   └── hilo.gd
-│       └── coinflip/
-│           ├── CoinFlip.tscn
-│           └── coinflip.gd
+│       ├── coinflip/
+│       │   ├── CoinFlip.tscn
+│       │   └── coinflip.gd
+│       └── wheel/
+│           ├── Wheel.tscn
+│           ├── wheel.gd            # Game logic + spin animation
+│           └── wheel_draw.gd       # Circular wheel _draw() rendering
+├── default_theme.tres              # Global theme: m5x7.ttf at 16px
 └── project.godot                   # Main scene: HiLo.tscn (temporary)
 ```
 
@@ -111,6 +118,23 @@ MINI_OFFSET_X=17  MINI_OFFSET_Y=7
 ### Coin Flip (`scenes/games/coinflip/`)
 
 Streak-based coin flip. Player picks Heads or Tails — correct guess doubles the multiplier (2×, 4×, 8×…). Cash out anytime after the first correct flip. First click on Heads/Tails also locks in the bet.
+
+### Wheel (`scenes/games/wheel/`)
+
+Multiplier wheel with three risk profiles. Player picks Low / Med / High risk, bets, and spins. The visual is a **circular spinning wheel** (full pie-segment wheel, not a strip) that decelerates to the winning segment under a fixed ▼ pointer at 12 o'clock.
+
+Risk profiles — all EV = 1.0 (no house edge), 20 segments each:
+- **Low** (60% win): 8×0x · 10×1.5x · 2×2.5x
+- **Med** (40% win): 12×0x · 6×2x · 2×4x
+- **High** (25% win): 15×0x · 4×2x · 1×12x
+
+Two scripts:
+- `wheel_draw.gd` — `Control` node that owns `_draw()`: draws pie segments (`draw_colored_polygon`), rotated text labels (`draw_set_transform` + `draw_string`), pearl dots on rim, dark hub. Reads `segments: Array` set by `wheel.gd`. Preloads `m5x7.ttf` directly.
+- `wheel.gd` — game logic: animates `wheel_draw.rotation` using `tween_property` with `EASE_OUT / TRANS_CUBIC` over 3.5s. Target angle: `-(win_idx + 0.5) * TAU / n` plus `SPIN_REV × TAU` of extra rotations.
+
+Layout: `WheelArea` (Control, 380px tall) → `WheelDraw` (fills area, rotates) + `WheelOverlay` (fills area, mouse_filter=IGNORE, contains ▼ pointer and SPIN button centered at anchor 0.5).
+
+**Note:** The `claim_wheel_spin()` function in `game_state.gd` is the **safety-net free spin** (4-hour cooldown), completely separate from this betting game.
 
 ---
 
@@ -146,7 +170,7 @@ Streak-based coin flip. Player picks Heads or Tails — correct guess doubles th
 ## What's Not Built Yet
 
 - Overworld / town scenes
-- Town 2–5 games (Wheel, Plinko, Roulette, Dice, Mines, Tower, Slots)
+- Town 2–5 remaining games (Plinko, Roulette, Dice, Mines, Tower, Slots)
 - Scene navigation / BackButton wiring
 - Multiplayer card rooms
 - Wheel of Fortune UI
