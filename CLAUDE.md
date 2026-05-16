@@ -112,6 +112,19 @@ MINI_OFFSET_X=17  MINI_OFFSET_Y=7
 
 Streak-based coin flip. Player picks Heads or Tails — correct guess doubles the multiplier (2×, 4×, 8×…). Cash out anytime after the first correct flip. First click on Heads/Tails also locks in the bet.
 
+### Wheel (`scenes/games/wheel/`)
+
+Multiplier wheel with three risk profiles. Player picks Low / Med / High risk, bets, and spins. The visual is a horizontal scrolling segment strip (not a rotating circle) that eases out to the winning tile under a fixed ▼ pointer.
+
+Risk profiles — all EV = 1.0 (no house edge), 20 segments each:
+- **Low** (60% win): 8×0x · 10×1.5x · 2×2.5x
+- **Med** (40% win): 12×0x · 6×2x · 2×4x
+- **High** (25% win): 15×0x · 4×2x · 1×12x
+
+Segment strip is built dynamically in GDScript (shuffled per spin, REPS=6 repetitions for scroll distance). Animation uses `Tween.EASE_OUT / TRANS_CUBIC` over 2.5s. Winning segment is always chosen from the last repetition to ensure a full scroll every spin.
+
+**Note:** The `claim_wheel_spin()` function in `game_state.gd` is the **safety-net free spin** (4-hour cooldown), completely separate from this betting game.
+
 ---
 
 ## Code Conventions
@@ -146,7 +159,7 @@ Streak-based coin flip. Player picks Heads or Tails — correct guess doubles th
 ## What's Not Built Yet
 
 - Overworld / town scenes
-- Town 2–5 games (Wheel, Plinko, Roulette, Dice, Mines, Tower, Slots)
+- Town 2–5 remaining games (Plinko, Roulette, Dice, Mines, Tower, Slots)
 - Scene navigation / BackButton wiring
 - Multiplayer card rooms
 - Wheel of Fortune UI
