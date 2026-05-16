@@ -1,7 +1,8 @@
 extends Control
 
-const CARD_SHEET  = preload("res://Assets/Cards/1.2 Poker cards.png")
-const MINI_SHEET  = preload("res://Assets/Cards/minicards.png")
+const CARD_SHEET     = preload("res://Assets/Cards/1.2 Poker cards.png")
+const MINI_SHEET     = preload("res://Assets/Cards/minicards.png")
+const CARD_SHADER    = preload("res://scenes/games/hilo/card_contrast.gdshader")
 
 # Full card atlas constants
 const CARD_W      := 46
@@ -174,6 +175,10 @@ func _update_history() -> void:
 		rect.texture              = _mini_card_tex(entry.x, entry.y)
 		rect.stretch_mode         = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		rect.custom_minimum_size  = Vector2(MINI_DISPLAY_W, MINI_DISPLAY_H)
+		rect.texture_filter       = CanvasItem.TEXTURE_FILTER_NEAREST
+		var mat := ShaderMaterial.new()
+		mat.shader = CARD_SHADER
+		rect.material = mat
 		history_container.add_child(rect)
 
 
