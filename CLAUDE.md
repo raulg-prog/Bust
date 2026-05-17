@@ -8,7 +8,7 @@ Read this file fully before doing any work on this project.
 
 Hey fellow Claude! The dev team says hi. Timmy — keep it up, you're doing great! 🎉
 
-This file is your full briefing. Read every section before touching anything. The Wheel game just went through a major calibration session — pay close attention to the Wheel section below before making any changes to it.
+This file is your full briefing. Read every section before touching anything. The Wheel game went through a major float-precision fix — pay close attention to the Wheel section before making any changes to it. The Main Menu background was also fully built this session — read that section carefully before touching `main_menu_bg.gd`.
 
 ---
 
@@ -86,6 +86,10 @@ Bust/
 ├── autoloads/
 │   └── game_state.gd               # Global singleton
 ├── scenes/
+│   ├── main_menu/
+│   │   ├── MainMenu.tscn           # Main menu — set as project main scene
+│   │   ├── main_menu.gd            # UI logic (New Game → HiLo, Quit)
+│   │   └── main_menu_bg.gd         # Procedural scrolling Leaf Green-style tilemap
 │   └── games/
 │       ├── hilo/
 │       │   ├── HiLo.tscn
@@ -98,7 +102,7 @@ Bust/
 │           ├── wheel.gd            # Game logic + spin animation
 │           └── wheel_overlay.gd    # Draws the gold ▼ pointer triangle (no rotation)
 ├── default_theme.tres              # Global theme: system font at 16px (m5x7 removed)
-└── project.godot                   # Main scene: HiLo.tscn (temporary)
+└── project.godot                   # Main scene: MainMenu.tscn
 ```
 
 ---
@@ -145,11 +149,34 @@ Single-bet multiplier wheel. Player enters a bet and clicks SPIN. The wheel spin
 
 **Spin math (critical — do not change without testing):**
 ```gdscript
-var seg_angle := TAU / float(n)          # 18° per segment
-var land_r    := -float(win_idx) * seg_angle   # NO +0.5 offset
+# Canonical angle — never read back from wheel_image.rotation
+var wheel_exact_rot : float = 0.0
+
+func _do_spin() -> void:
+    var seg_angle := TAU / float(n)
+    var land_r    := -float(win_idx) * seg_angle   # NO +0.5 — centres at exact multiples
+    var start_r   := wheel_exact_rot               # always a small, precise value
+    var excess    := fposmod(start_r - land_r, TAU)
+    var target_r  := start_r - excess - float(SPIN_REV) * TAU
+    wheel_exact_rot = land_r
+    wheel_image.rotation = start_r  # CRITICAL: force exact start before tween
+    # ... create_tween() ... tween_callback(_on_spin_complete.bind(win_idx, win_mult))
+
+func _on_spin_complete(win_idx: int, mult: float) -> void:
+    wheel_image.rotation = wheel_exact_rot  # snap to exact centre
 ```
+
+**Why `wheel_exact_rot` exists — do not remove it:**
+- `wheel_image.rotation` accumulates as a large negative float over many spins
+- `fposmod()` on large floats loses precision — `roundi()` snaps to the wrong neighbour
+- `wheel_exact_rot` is always reset to a small value (`land_r`, within one rotation) after every spin
+- Setting `wheel_image.rotation = start_r` before the tween ensures `target_r` is always within ~50 rad of 0, eliminating all float drift permanently
+- **Do NOT** read `win_idx` back from `wheel_image.rotation` after the tween — use the pre-bound value
+- **Do NOT** remove the `wheel_image.rotation = start_r` line before the tween — this is the key fix
+
+Other spin notes:
 - `Wheel.png` has segment **centres** at exact multiples of `seg_angle` (0°, 18°, 36°…) clockwise from 12 o'clock
-- **Do NOT add +0.5** — that moves the pointer to segment boundaries, not centres
+- **Do NOT add +0.5** to `land_r` — that shifts landing onto segment boundaries
 - Two `await get_tree().process_frame` in `_ready()` before `_sync_pivot()` — needed so nested layout is fully computed
 - `_sync_pivot()` uses `pivot_marker.position` (local coords) to set `wheel_image.pivot_offset`
 
@@ -197,6 +224,78 @@ EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — co
 
 ---
 
+## Main Menu (`scenes/main_menu/`)
+
+Scrolling Pokémon FireRed/LeafGreen-style tilemap background with a centered dark panel.
+
+### `main_menu_bg.gd` — Background renderer
+
+Generates a 128×96 tile procedural map and scrolls it diagonally at 14px/s × 6px/s. Wraps seamlessly. All tiles drawn via `draw_texture_rect` at 32×32 (2× native 16px). `texture_filter = TEXTURE_FILTER_NEAREST` for crisp GBA pixels.
+
+**18 tile types (`enum T`):**
+```
+GRASS, TALL_GRASS, FLOWER          — ground variants
+TREE, ROCK                         — sprite overlays (GRASS drawn beneath in _draw)
+WATER, WATER_EDGE                  — ocean / pond fill / shoreline
+SAND, SAND_EDGE                    — sandy beach / cliff-to-sand transition
+PATH, PATH_EDGE                    — gravel connecting paths
+TOWN_FLOOR                         — bright teal interior ground
+BLDG_ROOF_R, BLDG_ROOF_P, BLDG_ROOF_Y  — red / purple / gold roofs
+BLDG_WALL                          — cream wall tile with two windows
+CLIFF, CLIFF_BASE                  — upper cliff cap / lower cliff face
+```
+
+**Tile sources:**
+- Asset-sourced (from `Assets/Floor TIles/`): `GRASS`, `TALL_GRASS`, `TREE` (Tree_Pine_2_16x16), `ROCK`, `PATH`, `PATH_EDGE`
+- Programmatically generated (FR/LG palette): all others — water, cliffs, sand, town, buildings, flowers
+
+**FR/LG palette used in generators (do not change without visual check):**
+- Water deep: `Color(0.20, 0.44, 0.86)` — bright Pokémon ocean blue
+- Cliff top: `Color(0.74, 0.57, 0.33)` — warm tan
+- Cliff base: `Color(0.58, 0.40, 0.20)` — darker brown
+- Town floor: `Color(0.47, 0.79, 0.47)` — iconic FR/LG teal-green
+- Sand: `Color(0.80, 0.68, 0.40)` — warm beige
+- Flower red: `Color(0.92, 0.22, 0.18)` — scattered 3-petal flowers
+- Building wall: `Color(0.95, 0.93, 0.86)` — cream with blue-framed windows
+- Roofs: parametric — `_gen_roof(Color)` with lightened ridge + darkened shadow
+
+**Map layout:**
+- Two-layer cliff border wraps entire map (CLIFF_BASE outer 2 tiles, CLIFF inner 2 tiles)
+- Sandy beach ring just inside cliffs (SAND_EDGE + SAND, d=4 and d=5)
+- 18 forest clusters scattered across the map
+- 5 towns with teal floors, gravel paths, coloured buildings (roofs in rows, walls beneath)
+- 5 gravel paths connecting towns (horizontal + vertical, 2 tiles wide with PATH_EDGE borders)
+- 6 water ponds placed at fixed coordinates for visual variety
+- 28 scattered rocks on open grass
+
+**`_draw()` two-pass logic:** TREE and ROCK tiles draw GRASS beneath them first (transparency handling), then the overlay sprite on top.
+
+**Critical:** `posmod()` / `fposmod()` wrapping used throughout. Map indices are always `% MAP_W` / `% MAP_H` — never read out of bounds.
+
+### `main_menu.gd`
+Connects New Game (→ `HiLo.tscn`, temporary until overworld exists) and Quit.
+
+### `MainMenu.tscn` node tree
+```
+MainMenu (Control, main_menu.gd)
+  Background (Control, main_menu_bg.gd, mouse_filter=IGNORE)
+  DarkOverlay (ColorRect, Color(0,0,0,0.28), mouse_filter=IGNORE)
+  Center (CenterContainer, full anchors)
+    MenuPanel (PanelContainer, min 360px wide, styled dark purple)
+      VBox
+        TitleLabel  — "BUST", 60px gold
+        SubLabel    — "A Gambling Adventure", 15px muted
+        Divider     — 2px purple rule
+        Spacer      — 8px
+        NewGameButton (unique_name) — styled with hover gold border
+        QuitButton    (unique_name) — styled with hover gold border
+  VersionLabel — bottom-left, "v0.1 — Early Development"
+```
+
+**To activate the main menu**: In Godot editor → Project → Project Settings → Application → Run → Main Scene → set to `res://scenes/main_menu/MainMenu.tscn`.
+
+---
+
 ## What's Not Built Yet
 
 - Overworld / town scenes
@@ -212,7 +311,7 @@ EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — co
 
 ## Session Notes — Last worked on: 2026-05-17
 
-**Wheel game fully playable.** Everything below is resolved and working:
+### Wheel game — fully playable, all bugs resolved
 
 - Rebuilt `Wheel.tscn` from scratch (HiLo-style VBoxContainer layout)
 - New `Assets/Wheel/Wheel.png` and `Assets/Wheel/SpinBtn.png` integrated
@@ -223,5 +322,16 @@ EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — co
 - `randomize()` called in `_ready()` for proper RNG seeding
 - SEGMENTS array corrected — indices 16–19 had a cyclic shift vs PNG (now fixed)
 - Landing formula: `land_r = -float(win_idx) * seg_angle` (no +0.5 for this PNG)
+- **Float-precision bug fully resolved**: `wheel_exact_rot` canonical variable + `wheel_image.rotation = start_r` before tween. See Spin Math section above for full details.
 
-**Next up:** verify the pointer centering looks correct after the formula fix, then move on to scene navigation / BackButton wiring or the next game.
+### Main Menu — fully built
+
+- Procedural scrolling FR/LG-style background (`main_menu_bg.gd`) — 18 tile types, FR/LG palette, towns with buildings, forest clusters, water ponds, sandy cliff borders
+- `MainMenu.tscn` + `main_menu.gd` complete — styled panel, gold title, hover-state buttons
+- Trees switched to `Tree_Pine_2_16x16` (32×32) to avoid crown cutoff at screen edges
+- All tile colours matched to Pokémon FireRed/LeafGreen Four Island reference
+
+### Next up
+- Scene navigation / BackButton wiring (all game scenes need a back button to return to menu)
+- Next game: **Plinko** (Town 2, alongside Wheel)
+- Eventually: overworld map scene to replace the direct HiLo temp load in `main_menu.gd`

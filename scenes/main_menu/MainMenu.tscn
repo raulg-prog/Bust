@@ -1,0 +1,168 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://scenes/main_menu/main_menu_bg.gd" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.039, 0.027, 0.094, 0.90)
+border_color = Color(0.31, 0.239, 0.565, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 32.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
+bg_color = Color(0.31, 0.239, 0.565, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.067, 0.047, 0.157, 1)
+border_color = Color(0.31, 0.239, 0.565, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.118, 0.082, 0.235, 1)
+border_color = Color(1.0, 0.878, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.196, 0.137, 0.353, 1)
+border_color = Color(1.0, 0.878, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_bg")
+
+[node name="DarkOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0, 0.0, 0.0, 0.28)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuPanel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Center/MenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="Center/MenuPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_font_sizes/font_size = 60
+text = "BUST"
+horizontal_alignment = 1
+
+[node name="SubLabel" type="Label" parent="Center/MenuPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.78, 1)
+theme_override_font_sizes/font_size = 15
+text = "A Gambling Adventure"
+horizontal_alignment = 1
+
+[node name="Divider" type="PanelContainer" parent="Center/MenuPanel/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_divider")
+
+[node name="Spacer" type="Control" parent="Center/MenuPanel/VBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="Center/MenuPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.9, 1.0, 1)
+theme_override_colors/font_hover_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_colors/font_pressed_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_normal")
+text = "New Game"
+
+[node name="QuitButton" type="Button" parent="Center/MenuPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.9, 1.0, 1)
+theme_override_colors/font_hover_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_colors/font_pressed_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_normal")
+text = "Quit"
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -26.0
+offset_right = 200.0
+offset_bottom = -6.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 0.7)
+theme_override_font_sizes/font_size = 13
+text = "v0.1 — Early Development"

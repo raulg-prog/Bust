@@ -32,8 +32,9 @@ const SEGMENTS: Array[float] = [
 
 enum State { IDLE, SPINNING }
 
-var state       : State = State.IDLE
-var current_bet : float = 0.0
+var state           : State = State.IDLE
+var current_bet     : float = 0.0
+var wheel_exact_rot : float = 0.0   # canonical wheel angle — never read from wheel_image.rotation
 
 @onready var balance_label : Label       = %BalanceLabel
 @onready var fame_label    : Label       = %FameLabel
@@ -81,19 +82,23 @@ func _on_spin() -> void:
 
 
 func _do_spin() -> void:
-	var n        := SEGMENTS.size()
-	var win_idx  := randi_range(0, n - 1)
-	var win_mult := SEGMENTS[win_idx]
+	var n         := SEGMENTS.size()
+	var win_idx   := randi_range(0, n - 1)
+	var win_mult  := SEGMENTS[win_idx]
 
-	# Segment i's centre sits at exactly i*(TAU/n) clockwise from 12 o'clock in this PNG.
+	# Segment i is centred at i*(TAU/n) clockwise from 12 o'clock.
 	var seg_angle := TAU / float(n)
 	var land_r    := -float(win_idx) * seg_angle
 
-	# Find the equivalent landing angle that is at least SPIN_REV full rotations
-	# counter-clockwise from the current rotation.
-	var cur      := wheel_image.rotation
-	var excess   := fposmod(cur - land_r, TAU)   # overshoot past landing in [0, TAU)
-	var target_r := cur - excess - float(SPIN_REV) * TAU
+	var start_r  := wheel_exact_rot                          # always a small exact value in [-TAU, 0]
+	var excess   := fposmod(start_r - land_r, TAU)           # CCW distance to travel in [0, TAU)
+	var target_r := start_r - excess - float(SPIN_REV) * TAU # always within ~50 rad of 0
+
+	wheel_exact_rot = land_r  # commit before tween so callback can snap to it
+
+	# Force the wheel to the exact start position — ensures the tween begins from a
+	# float-precise value and target_r never accumulates across spins.
+	wheel_image.rotation = start_r
 
 	var tween := create_tween()
 	tween.set_ease(Tween.EASE_OUT)
@@ -102,7 +107,10 @@ func _do_spin() -> void:
 	tween.tween_callback(_on_spin_complete.bind(win_idx, win_mult))
 
 
-func _on_spin_complete(_idx: int, mult: float) -> void:
+func _on_spin_complete(win_idx: int, mult: float) -> void:
+	# Snap the visual to the exact segment centre — corrects any tween float residual.
+	wheel_image.rotation = wheel_exact_rot
+
 	if mult == 1.0:
 		result_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.45, 1))
 		result_label.text = "Spin Again!"
