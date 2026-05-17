@@ -71,7 +71,7 @@ text = "0 / 5,000 Fame"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 250)
+custom_minimum_size = Vector2(0, 290)
 texture_filter = 1
 stretch_mode = 5
 

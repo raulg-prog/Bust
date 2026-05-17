@@ -9,6 +9,7 @@ const RIM_THICK   := 14.0   # outer dark rim width
 const DOT_COUNT   := 24     # pearl dots around the rim
 const DOT_RADIUS  := 4.0
 const HUB_RADIUS  := 28.0
+const MAX_RADIUS  := 130.0  # hard cap — wheel never exceeds 260 px diameter
 
 # Colors
 const C_RIM       := Color(0.14, 0.09, 0.05, 1)     # dark brown outer rim
@@ -26,7 +27,7 @@ func _draw() -> void:
 		return
 
 	var center  := size / 2.0
-	var radius  := minf(size.x, size.y) / 2.0
+	var radius  := minf(minf(size.x, size.y) / 2.0, MAX_RADIUS)
 	var inner_r := radius - RIM_THICK
 	var n       := segments.size()
 	var arc     := TAU / n
@@ -79,7 +80,7 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)  # reset transform
 
 	# ── Pearl dots on rim ──────────────────────────────────────────────────────
-	var dot_r := radius - RIM_THICK / 2.0
+	var dot_r := radius - RIM_THICK * 0.5
 	for d in DOT_COUNT:
 		var a    := d * TAU / DOT_COUNT
 		var pos  := center + Vector2(cos(a), sin(a)) * dot_r

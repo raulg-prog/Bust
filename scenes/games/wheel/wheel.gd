@@ -6,7 +6,6 @@ const SPIN_REV := 6   # full rotations added before landing
 
 # Segments clockwise from 12 o'clock — must match the wheel image exactly
 # 1.0 = Spin Again (return bet, free re-spin, no Fame change)
-# EV = 1.0: 2(1)+2(3)+1(5)+2(2)+3(0.5)+4(0.25)+5(0.1)+1(0) / 20 = 1.0
 const SEGMENTS: Array[float] = [
 	1.0,   # 0  Spin Again
 	3.0,   # 1  3x
@@ -40,19 +39,82 @@ var current_bet : float = 0.0
 @onready var result_label  : Label       = %ResultLabel
 @onready var bet_input     : LineEdit    = %BetInput
 @onready var spin_btn      : Button      = %SpinButton
-@onready var wheel_image   : TextureRect = %WheelImage
+@onready var wheel_image   : Control     = %WheelImage
 @onready var pivot_marker  : Control     = %PivotMarker
 
 
 func _ready() -> void:
 	spin_btn.pressed.connect(_on_spin)
 	await get_tree().process_frame
-	# Pivot is the center of PivotMarker, expressed in WheelImage's local space.
-	# Drag PivotMarker in the editor until it sits on the wheel hub, then it's exact.
-	var hub := pivot_marker.position + pivot_marker.size / 2.0
-	wheel_image.pivot_offset = hub - wheel_image.position
+
+	# ── Wheel sizing ─────────────────────────────────────────────────────────
+	# WheelArea lives inside the VBoxContainer (GameArea).
+	# SIZE_SHRINK_CENTER on both axes tells the VBox to give it exactly its
+	# minimum size (260×260) instead of expanding to fill all available space.
+	var wheel_area := wheel_image.get_parent() as Control
+	if wheel_area:
+		wheel_area.custom_minimum_size   = Vector2(260.0, 260.0)
+		wheel_area.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		wheel_area.size_flags_vertical   = Control.SIZE_SHRINK_CENTER
+
+	# WheelImage is inside WheelArea (a plain Control, not a Container).
+	# Use PRESET_FULL_RECT so it fills WheelArea exactly — no anchor math needed.
+	wheel_image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	await get_tree().process_frame
+
+	wheel_image.pivot_offset = wheel_image.size * 0.5
 	pivot_marker.hide()
+
+	# ── Move legacy TopSection / BottomSection out of the wheel's way ────────
+	# The editor may have an old cached scene where these overlap the wheel.
+	# Pin TopSection to the very top of the screen and BottomSection to the
+	# very bottom so they are always visible regardless of wheel size.
+	_pin_sections()
+
+	if not wheel_image.resized.is_connected(queue_redraw):
+		wheel_image.resized.connect(queue_redraw)
+	queue_redraw()
 	_update_hud()
+
+
+func _pin_sections() -> void:
+	var top := get_node_or_null("TopSection") as Control
+	var bot := get_node_or_null("BottomSection") as Control
+	if top:
+		top.anchor_left   = 0.5;  top.anchor_right  = 0.5
+		top.anchor_top    = 0.0;  top.anchor_bottom = 0.0
+		top.offset_left   = -260.0; top.offset_right  = 260.0
+		top.offset_top    = 8.0;    top.offset_bottom = 80.0
+	if bot:
+		bot.anchor_left   = 0.5;  bot.anchor_right  = 0.5
+		bot.anchor_top    = 1.0;  bot.anchor_bottom = 1.0
+		bot.offset_left   = -260.0; bot.offset_right  = 260.0
+		bot.offset_top    = -90.0;  bot.offset_bottom = -8.0
+
+
+func _draw() -> void:
+	if not is_instance_valid(wheel_image):
+		return
+	var pos := wheel_image.global_position
+	var sz  := wheel_image.size
+	if sz.x < 1.0:
+		return
+	var cx     := pos.x + sz.x * 0.5
+	var tip_y  := pos.y - 6.0
+	var base_y := pos.y - 30.0
+	var pts    := PackedVector2Array([
+		Vector2(cx,        tip_y),
+		Vector2(cx - 14.0, base_y),
+		Vector2(cx + 14.0, base_y),
+	])
+	draw_colored_polygon(pts, Color(1.0, 0.878, 0.2, 1.0))
+	draw_polyline(PackedVector2Array([
+		Vector2(cx - 14.0, base_y),
+		Vector2(cx,        tip_y),
+		Vector2(cx + 14.0, base_y),
+		Vector2(cx - 14.0, base_y),
+	]), Color(0.0, 0.0, 0.0, 0.6), 1.5)
 
 
 func _on_spin() -> void:
@@ -78,15 +140,13 @@ func _do_spin() -> void:
 	var win_idx  := randi_range(0, n - 1)
 	var win_mult := SEGMENTS[win_idx]
 
-	# Segment i's center sits at i*(TAU/n) clockwise from 12 o'clock in the image.
-	# To bring it to the pointer (top), rotate the wheel CCW by that same angle.
+	# Segment i's centre sits at i*(TAU/n) clockwise from 12 o'clock in the image.
+	# Rotate the wheel CCW by that angle to bring it to the pointer.
 	var seg_angle := TAU / float(n)
 	var land_r    := -float(win_idx) * seg_angle
 
-	# Find the equivalent landing angle that is at least SPIN_REV full rotations
-	# counter-clockwise from the current rotation.
 	var cur      := wheel_image.rotation
-	var excess   := fposmod(cur - land_r, TAU)   # overshoot past landing in [0, TAU)
+	var excess   := fposmod(cur - land_r, TAU)
 	var target_r := cur - excess - float(SPIN_REV) * TAU
 
 	var tween := create_tween()
@@ -104,7 +164,6 @@ func _on_spin_complete(mult: float) -> void:
 		_do_spin()
 		return
 
-	# delta is positive (profit) or negative (loss)
 	var delta := current_bet * (mult - 1.0)
 	GameState.bankroll += delta
 

@@ -97,21 +97,24 @@ func _animate(lands_heads: bool) -> void:
 	var peak_frame := HEADS_PEAK_FRAME if lands_heads else TAILS_PEAK_FRAME
 	var face_frame := HEADS_FRAME_IDX  if lands_heads else TAILS_FRAME_IDX
 
-	# Fast: 3 full rotation cycles (frames 0-15)
+	# Fast: 3 full rotation cycles, starting from the half opposite the current face.
+	# If heads is showing → start at frame 8 (tails half) so tails appears first.
+	# If tails is showing → start at frame 0 (heads half) so heads appears first.
+	var start_frame := 8 if last_landed_heads else 0
 	for _c in range(3):
-		for f in range(SPIN_FRAME_COUNT):
-			tween.tween_callback(_show_strip_frame.bind(f))
-			tween.tween_interval(0.04)
+		for i in range(SPIN_FRAME_COUNT):
+			tween.tween_callback(_show_strip_frame.bind((start_frame + i) % SPIN_FRAME_COUNT))
+			tween.tween_interval(0.055)
 
 	# Slow approach from frame 0 up to the peak of the winning face.
-	# After 3 cycles the last frame shown is 15 (tails narrow), so continuing
-	# from 0 (edge) flows naturally: edge → winning face expanding → peak.
+	# Last fast frame is always frame (start_frame - 1) % 16, which is near-edge,
+	# so continuing from 0 (edge) flows naturally: edge → winning face expanding → peak.
 	for f in range(peak_frame + 1):
 		tween.tween_callback(_show_strip_frame.bind(f))
-		tween.tween_interval(0.10)
+		tween.tween_interval(0.13)
 
 	# Brief pause at peak width, then snap to the full landing face
-	tween.tween_interval(0.22)
+	tween.tween_interval(0.30)
 	tween.tween_callback(_show_strip_frame.bind(face_frame))
 	tween.tween_interval(0.4)
 	tween.tween_callback(_on_flip_done.bind(lands_heads))
