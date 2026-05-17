@@ -41,7 +41,7 @@ layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
-text = "♣  COIN FLIP  ♦"
+text = "*  COIN FLIP  *"
 
 [node name="TitleDivider" type="PanelContainer" parent="Center/GameArea"]
 layout_mode = 2
@@ -100,7 +100,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 modulate = Color(1.0, 0.878, 0.2, 1)
-text = "▲  HEADS"
+text = "^  HEADS"
 
 [node name="FlipButton" type="Button" parent="Center/GameArea/SelectionRow"]
 unique_name_in_owner = true
@@ -115,7 +115,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 modulate = Color(0.5, 0.78, 1.0, 1)
-text = "▼  TAILS"
+text = "v  TAILS"
 
 [node name="CashOutButton" type="Button" parent="Center/GameArea"]
 unique_name_in_owner = true
@@ -162,4 +162,4 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 108.0
 offset_bottom = 44.0
-text = "← Back"
+text = "< Back"

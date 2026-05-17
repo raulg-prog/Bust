@@ -48,7 +48,7 @@ layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
-text = "♠  HI-LO  ♥"
+text = "*  HI-LO  *"
 
 [node name="TitleDivider" type="PanelContainer" parent="Center/GameArea"]
 layout_mode = 2
@@ -134,7 +134,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 modulate = Color(0.6, 1.0, 0.6, 1)
 disabled = true
-text = "▲  HIGHER OR SAME"
+text = "^  HIGHER OR SAME"
 
 [node name="LowerCol" type="VBoxContainer" parent="Center/GameArea/ActionArea"]
 layout_mode = 2
@@ -155,7 +155,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 modulate = Color(1.0, 0.5, 0.5, 1)
 disabled = true
-text = "▼  LOWER OR SAME"
+text = "v  LOWER OR SAME"
 
 [node name="SkipButton" type="Button" parent="Center/GameArea"]
 unique_name_in_owner = true
@@ -207,4 +207,4 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 108.0
 offset_bottom = 44.0
-text = "← Back"
+text = "< Back"

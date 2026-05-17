@@ -1,16 +1,14 @@
 [gd_scene format=3 uid="uid://dgb53iblx6v41"]
 
 [ext_resource type="Script" uid="uid://37x442eh4ach" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
-[ext_resource type="Texture2D" uid="uid://bm8tw4hnrdpop" path="res://Assets/Wheel/Asset 2 wheel.png" id="2_wheel_tex"]
-[ext_resource type="Shader" path="res://scenes/games/wheel/wheel_clip.gdshader" id="3_shader"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wheel"]
-shader = ExtResource("3_shader")
+[ext_resource type="Texture2D" uid="uid://bib8xnt7qgii3" path="res://Assets/Wheel/Wheel.png" id="2_wheel_tex"]
+[ext_resource type="Texture2D" uid="uid://s8hend84txmy" path="res://Assets/Wheel/SpinBtn.png" id="3_spinbtn_tex"]
+[ext_resource type="Script" path="res://scenes/games/wheel/wheel_overlay.gd" id="4_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
 bg_color = Color(0.31, 0.239, 0.565, 1)
 
-[node name="Wheel" type="Control"]
+[node name="Wheel" type="Control" unique_id=1812124858]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,8 +17,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_wheel")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 3
+[node name="Background" type="ColorRect" parent="." unique_id=207213290]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -28,130 +26,134 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.039, 0.027, 0.094, 1)
 
-[node name="TopSection" type="VBoxContainer" parent="."]
-layout_mode = 3
-anchor_left = 0.5
-anchor_top = 0.0
-anchor_right = 0.5
-anchor_bottom = 0.0
-offset_left = -260.0
-offset_top = 8.0
-offset_right = 260.0
-offset_bottom = 80.0
-theme_override_constants/separation = 8
+[node name="Center" type="CenterContainer" parent="." unique_id=781224320]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="TitleLabel" type="Label" parent="TopSection"]
+[node name="GameArea" type="VBoxContainer" parent="Center" unique_id=1063039535]
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="Center/GameArea" unique_id=486428242]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_font_sizes/font_size = 26
 text = "★  WHEEL  ★"
+horizontal_alignment = 1
 
-[node name="TitleDivider" type="PanelContainer" parent="TopSection"]
-layout_mode = 2
+[node name="TitleDivider" type="PanelContainer" parent="Center/GameArea" unique_id=596835214]
 custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_divider")
 
-[node name="TopBar" type="HBoxContainer" parent="TopSection"]
+[node name="TopBar" type="HBoxContainer" parent="Center/GameArea" unique_id=208485070]
 layout_mode = 2
 
-[node name="BalanceLabel" type="Label" parent="TopSection/TopBar"]
+[node name="BalanceLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=1959145980]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.4, 1.0, 0.5, 1)
+theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 20
 text = "Balance:  $1,000"
 
-[node name="FameLabel" type="Label" parent="TopSection/TopBar"]
+[node name="FameLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=1826595186]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 2
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.5, 0.78, 1.0, 1)
+theme_override_colors/font_color = Color(0.5, 0.78, 1, 1)
+theme_override_font_sizes/font_size = 20
 text = "0 / 25,000 Fame"
+horizontal_alignment = 2
 
-[node name="WheelImage" type="TextureRect" parent="."]
+[node name="WheelContainer" type="Control" parent="Center/GameArea" unique_id=990973062]
+custom_minimum_size = Vector2(380, 380)
+layout_mode = 2
+size_flags_horizontal = 4
+metadata/_edit_lock_ = true
+
+[node name="WheelImage" type="TextureRect" parent="Center/GameArea/WheelContainer" unique_id=1822096181]
 unique_name_in_owner = true
-layout_mode = 3
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -130.0
-offset_top = -130.0
-offset_right = 130.0
-offset_bottom = 130.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_wheel_tex")
+expand_mode = 1
 stretch_mode = 5
-material = SubResource("ShaderMaterial_wheel")
 
-[node name="PivotMarker" type="Control" parent="."]
+[node name="SpinButton" type="TextureButton" parent="Center/GameArea/WheelContainer" unique_id=1129629488]
 unique_name_in_owner = true
-layout_mode = 3
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+offset_left = -58.0
+offset_top = -58.0
+offset_right = 62.0
+offset_bottom = 62.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("3_spinbtn_tex")
+
+[node name="PivotMarker" type="Control" parent="Center/GameArea/WheelContainer" unique_id=97173970]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 mouse_filter = 2
 
-[node name="BottomSection" type="VBoxContainer" parent="."]
-layout_mode = 3
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
+[node name="WheelOverlay" type="Control" parent="Center/GameArea/WheelContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -260.0
-offset_top = -90.0
-offset_right = 260.0
-offset_bottom = -8.0
-theme_override_constants/separation = 8
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_overlay")
 
-[node name="ResultLabel" type="Label" parent="BottomSection"]
+[node name="ResultLabel" type="Label" parent="Center/GameArea" unique_id=133000885]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0.45, 1)
+theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(1.0, 1.0, 0.45, 1)
-text = ""
 
-[node name="BetRow" type="HBoxContainer" parent="BottomSection"]
+[node name="BetRow" type="HBoxContainer" parent="Center/GameArea" unique_id=211404238]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="BetLabel" type="Label" parent="BottomSection/BetRow"]
+[node name="BetLabel" type="Label" parent="Center/GameArea/BetRow" unique_id=109558668]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.65, 0.78, 1)
+theme_override_font_sizes/font_size = 20
 text = "Bet:  $"
 vertical_alignment = 1
 
-[node name="BetInput" type="LineEdit" parent="BottomSection/BetRow"]
+[node name="BetInput" type="LineEdit" parent="Center/GameArea/BetRow" unique_id=948841585]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(100, 0)
 size_flags_horizontal = 3
 text = "100"
 placeholder_text = "Amount"
 
-[node name="SpinButton" type="Button" parent="BottomSection/BetRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "SPIN"
-
-[node name="BackButton" type="Button" parent="."]
-layout_mode = 3
-anchors_preset = 1
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
+[node name="BackButton" type="Button" parent="." unique_id=1613937980]
+layout_mode = 0
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 108.0
 offset_bottom = 44.0
+grow_horizontal = 0
 text = "← Back"

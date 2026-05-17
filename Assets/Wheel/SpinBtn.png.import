@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bm8tw4hnrdpop"
-path="res://.godot/imported/Asset 2 wheel.png-c566773aa5e55cd4f1e0362a9f2b8dc2.ctex"
+uid="uid://s8hend84txmy"
+path="res://.godot/imported/SpinBtn.png-7b3153d4f0650d1403ebfce85102b62f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Wheel/Asset 2 wheel.png"
-dest_files=["res://.godot/imported/Asset 2 wheel.png-c566773aa5e55cd4f1e0362a9f2b8dc2.ctex"]
+source_file="res://Assets/Wheel/SpinBtn.png"
+dest_files=["res://.godot/imported/SpinBtn.png-7b3153d4f0650d1403ebfce85102b62f.ctex"]
 
 [params]
 

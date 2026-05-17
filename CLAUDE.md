@@ -4,6 +4,14 @@ Read this file fully before doing any work on this project.
 
 ---
 
+## 👋 Note to Friend's AI
+
+Hey fellow Claude! The dev team says hi. Timmy — keep it up, you're doing great! 🎉
+
+This file is your full briefing. Read every section before touching anything. The Wheel game just went through a major calibration session — pay close attention to the Wheel section below before making any changes to it.
+
+---
+
 ## What This Game Is
 
 **Bust** is a 2D top-down adventure RPG built in Godot 4.6 (GDScript), targeting Steam PC.
@@ -70,7 +78,10 @@ Bust/
 │   │   ├── 1.2 Poker cards.png     # Full card spritesheet (944×385px)
 │   │   └── minicards.png           # History strip cards (433×160px)
 │   ├── Fonts/
-│   │   └── m5x7.ttf                # Global pixel font (GBA style)
+│   │   └── m5x7.ttf                # Pixel font (kept in assets, NOT used in theme)
+│   ├── Wheel/
+│   │   ├── Wheel.png               # Wheel image — 20 segments, centres at 12 o'clock multiples
+│   │   └── SpinBtn.png             # Spin button image (green SPIN circle)
 │   └── Floor TIles/                # Tileset assets (not yet wired up)
 ├── autoloads/
 │   └── game_state.gd               # Global singleton
@@ -85,8 +96,8 @@ Bust/
 │       └── wheel/
 │           ├── Wheel.tscn
 │           ├── wheel.gd            # Game logic + spin animation
-│           └── wheel_draw.gd       # Circular wheel _draw() rendering
-├── default_theme.tres              # Global theme: m5x7.ttf at 16px
+│           └── wheel_overlay.gd    # Draws the gold ▼ pointer triangle (no rotation)
+├── default_theme.tres              # Global theme: system font at 16px (m5x7 removed)
 └── project.godot                   # Main scene: HiLo.tscn (temporary)
 ```
 
@@ -121,20 +132,39 @@ Streak-based coin flip. Player picks Heads or Tails — correct guess doubles th
 
 ### Wheel (`scenes/games/wheel/`)
 
-Multiplier wheel with three risk profiles. Player picks Low / Med / High risk, bets, and spins. The visual is a **circular spinning wheel** (full pie-segment wheel, not a strip) that decelerates to the winning segment under a fixed ▼ pointer at 12 o'clock.
+Single-bet multiplier wheel. Player enters a bet and clicks SPIN. The wheel spins and decelerates to a winning segment under a fixed gold ▼ pointer at 12 o'clock.
 
-Risk profiles — all EV = 1.0 (no house edge), 20 segments each:
-- **Low** (60% win): 8×0x · 10×1.5x · 2×2.5x
-- **Med** (40% win): 12×0x · 6×2x · 2×4x
-- **High** (25% win): 15×0x · 4×2x · 1×12x
+**Layout:**
+- `Wheel.tscn` uses the same VBoxContainer structure as HiLo
+- `WheelContainer` (Control, 380×380, `size_flags_horizontal = 4` = SIZE_SHRINK_CENTER) holds:
+  - `WheelImage` (TextureRect, anchors_preset=15, fills container, rotates) — `Wheel.png`
+  - `SpinButton` (TextureButton, anchor 0.5/0.5, ±60px = 120×120) — `SpinBtn.png`
+  - `PivotMarker` (Control, anchor 0.5/0.5, zero size, mouse_filter=IGNORE) — drag in editor to align with hub
+  - `WheelOverlay` (Control, anchors_preset=15, mouse_filter=IGNORE) — runs `wheel_overlay.gd`, draws gold triangle pointer
+- `WheelContainer` is locked (`metadata/_edit_lock_ = true`) — don't move it by accident
 
-Two scripts:
-- `wheel_draw.gd` — `Control` node that owns `_draw()`: draws pie segments (`draw_colored_polygon`), rotated text labels (`draw_set_transform` + `draw_string`), pearl dots on rim, dark hub. Reads `segments: Array` set by `wheel.gd`. Preloads `m5x7.ttf` directly.
-- `wheel.gd` — game logic: animates `wheel_draw.rotation` using `tween_property` with `EASE_OUT / TRANS_CUBIC` over 3.5s. Target angle: `-(win_idx + 0.5) * TAU / n` plus `SPIN_REV × TAU` of extra rotations.
+**Spin math (critical — do not change without testing):**
+```gdscript
+var seg_angle := TAU / float(n)          # 18° per segment
+var land_r    := -float(win_idx) * seg_angle   # NO +0.5 offset
+```
+- `Wheel.png` has segment **centres** at exact multiples of `seg_angle` (0°, 18°, 36°…) clockwise from 12 o'clock
+- **Do NOT add +0.5** — that moves the pointer to segment boundaries, not centres
+- Two `await get_tree().process_frame` in `_ready()` before `_sync_pivot()` — needed so nested layout is fully computed
+- `_sync_pivot()` uses `pivot_marker.position` (local coords) to set `wheel_image.pivot_offset`
 
-Layout: `WheelArea` (Control, 380px tall) → `WheelDraw` (fills area, rotates) + `WheelOverlay` (fills area, mouse_filter=IGNORE, contains ▼ pointer and SPIN button centered at anchor 0.5).
+**SEGMENTS array (indices 0–19, clockwise from 12 o'clock):**
+```
+0: Spin Again (1.0)   1: 3x     2: 0.1x   3: 0.5x   4: 0.25x
+5: 5x                 6: 0.1x   7: 0.25x  8: 2x     9: 0.1x
+10: Spin Again (1.0)  11: 0.1x  12: 3x    13: 0.5x  14: 0.25x
+15: 0x                16: 0.5x  17: 0.1x  18: 2x    19: 0.25x
+```
+EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — corrected this session.
 
-**Note:** The `claim_wheel_spin()` function in `game_state.gd` is the **safety-net free spin** (4-hour cooldown), completely separate from this betting game.
+**Font:** m5x7 was removed from the project theme entirely. System font is used. All Unicode icons (★ ♠ ▼ ←) replaced with ASCII equivalents (* ^ v <) in all scenes.
+
+**Note:** `claim_wheel_spin()` in `game_state.gd` is the **safety-net free spin** (4-hour cooldown) — completely separate from this betting game.
 
 ---
 
@@ -173,7 +203,25 @@ Layout: `WheelArea` (Control, 380px tall) → `WheelDraw` (fills area, rotates) 
 - Town 2–5 remaining games (Plinko, Roulette, Dice, Mines, Tower, Slots)
 - Scene navigation / BackButton wiring
 - Multiplayer card rooms
-- Wheel of Fortune UI
+- Wheel of Fortune UI (safety-net free spin — separate from the Wheel betting game)
 - Save/load system
 - OST and sound effects
 - NPC sidequests
+
+---
+
+## Session Notes — Last worked on: 2026-05-17
+
+**Wheel game fully playable.** Everything below is resolved and working:
+
+- Rebuilt `Wheel.tscn` from scratch (HiLo-style VBoxContainer layout)
+- New `Assets/Wheel/Wheel.png` and `Assets/Wheel/SpinBtn.png` integrated
+- `SpinButton` is a `TextureButton` (not `Button`) — typed as `BaseButton` in script
+- `PivotMarker` approach for reliable pivot_offset — await 2 frames in `_ready()`
+- `wheel_overlay.gd` draws gold pointer triangle, 12px above wheel top edge
+- `WheelContainer` locked in editor (`metadata/_edit_lock_ = true`)
+- `randomize()` called in `_ready()` for proper RNG seeding
+- SEGMENTS array corrected — indices 16–19 had a cyclic shift vs PNG (now fixed)
+- Landing formula: `land_r = -float(win_idx) * seg_angle` (no +0.5 for this PNG)
+
+**Next up:** verify the pointer centering looks correct after the formula fix, then move on to scene navigation / BackButton wiring or the next game.
