@@ -1,12 +1,12 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://b00nimcafjr2h"]
 
-[ext_resource type="Script" path="res://scenes/games/plinko/plinko.gd" id="1_plinko"]
-[ext_resource type="Script" path="res://scenes/games/plinko/plinko_board.gd" id="2_board"]
+[ext_resource type="Script" uid="uid://2vmvhkm6s5re" path="res://scenes/games/plinko/plinko.gd" id="1_plinko"]
+[ext_resource type="Script" uid="uid://ciavdysgbpkyn" path="res://scenes/games/plinko/plinko_board.gd" id="2_board"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.659, 0.220, 0.220, 1)
+bg_color = Color(0.659, 0.22, 0.22, 1)
 
-[node name="Plinko" type="Control"]
+[node name="Plinko" type="Control" unique_id=1689632401]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,8 +15,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_plinko")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 3
+[node name="Background" type="ColorRect" parent="." unique_id=1043845073]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -24,99 +24,94 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.157, 0.031, 0.031, 1)
 
-[node name="Center" type="CenterContainer" parent="."]
-layout_mode = 3
+[node name="Center" type="CenterContainer" parent="." unique_id=316435013]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameArea" type="VBoxContainer" parent="Center"]
-layout_mode = 2
+[node name="GameArea" type="VBoxContainer" parent="Center" unique_id=17393042]
 custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="Center/GameArea"]
+[node name="TitleLabel" type="Label" parent="Center/GameArea" unique_id=1050009214]
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_font_sizes/font_size = 26
 text = "*  PLINKO  *"
+horizontal_alignment = 1
 
-[node name="TitleDivider" type="PanelContainer" parent="Center/GameArea"]
-layout_mode = 2
+[node name="TitleDivider" type="PanelContainer" parent="Center/GameArea" unique_id=1806530290]
 custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_divider")
 
-[node name="TopBar" type="HBoxContainer" parent="Center/GameArea"]
+[node name="TopBar" type="HBoxContainer" parent="Center/GameArea" unique_id=122848955]
 layout_mode = 2
 
-[node name="BalanceLabel" type="Label" parent="Center/GameArea/TopBar"]
+[node name="BalanceLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=1083044517]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.376, 0.973, 0.502, 1)
+theme_override_font_sizes/font_size = 20
 text = "Balance:  $1,000"
 
-[node name="FameLabel" type="Label" parent="Center/GameArea/TopBar"]
+[node name="FameLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=198755889]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 2
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.502, 0.753, 0.973, 1)
+theme_override_font_sizes/font_size = 20
 text = "0 / 25,000 Fame"
+horizontal_alignment = 2
 
-[node name="Board" type="Control" parent="Center/GameArea"]
+[node name="Board" type="Control" parent="Center/GameArea" unique_id=1030395490]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(390, 460)
+layout_mode = 2
 size_flags_horizontal = 4
 script = ExtResource("2_board")
 
-[node name="ResultLabel" type="Label" parent="Center/GameArea"]
+[node name="ResultLabel" type="Label" parent="Center/GameArea" unique_id=338892946]
 unique_name_in_owner = true
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.973, 0.973, 0.439, 1)
-text = ""
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
 
-[node name="BetRow" type="HBoxContainer" parent="Center/GameArea"]
+[node name="BetRow" type="HBoxContainer" parent="Center/GameArea" unique_id=896816051]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="BetLabel" type="Label" parent="Center/GameArea/BetRow"]
+[node name="BetLabel" type="Label" parent="Center/GameArea/BetRow" unique_id=1896110096]
 layout_mode = 2
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.627, 0.627, 0.753, 1)
+theme_override_font_sizes/font_size = 20
 text = "Bet:  $"
+vertical_alignment = 1
 
-[node name="BetInput" type="LineEdit" parent="Center/GameArea/BetRow"]
+[node name="BetInput" type="LineEdit" parent="Center/GameArea/BetRow" unique_id=64410533]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
 text = "100"
 placeholder_text = "Amount"
 
-[node name="DropButton" type="Button" parent="Center/GameArea/BetRow"]
+[node name="DropButton" type="Button" parent="Center/GameArea/BetRow" unique_id=942741010]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "DROP"
 
-[node name="BackButton" type="Button" parent="."]
+[node name="BackButton" type="Button" parent="." unique_id=1368753667]
 unique_name_in_owner = true
-layout_mode = 3
-anchors_preset = 1
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
+layout_mode = 0
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 108.0
 offset_bottom = 44.0
+grow_horizontal = 0
 text = "< Back"

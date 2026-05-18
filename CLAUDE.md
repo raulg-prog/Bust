@@ -205,36 +205,48 @@ EV = 1.15 (5×1 + 8×0.5 + 2×2 + 1×10 + 4×0) / 20 = 23/20.
 
 ### Plinko (`scenes/games/plinko/`)
 
-Single-bet Galton board. Player enters a bet and clicks DROP. The gold ball falls through 12 rows of pegs and lands in one of 13 buckets. Payout = bet × bucket multiplier.
+Single-bet Galton board. Player enters a bet and clicks DROP. Ball falls through pegs and lands in one of 13 buckets. Payout = bet × bucket multiplier. Multiple balls can be in flight simultaneously.
 
 **Architecture — two-script design:**
-- `plinko_board.gd` (`class_name PlinkoBoard`, extends Control) — pure renderer, no game logic
-- `plinko.gd` — game logic only; drives the board via its public API
+- `plinko_board.gd` (`class_name PlinkoBoard`, extends Control) — pure renderer + board geometry API
+- `plinko.gd` — game logic, RNG, path construction, tween animation
 
 **Board geometry (all in `plinko_board.gd`):**
-- 12 rows × (row+1) pegs — row 0 has 1 peg, row 11 has 12 pegs
-- Peg spacing `_ps() = size.x / 13` — adapts to control width (designed for 390px → 30px/col)
+- `ROWS = 12`, `BUCKETS = 13`
+- Peg spacing `_ps() = size.x / 13` (designed for 390px → 30px/col)
 - Peg position: `cx + (col - row * 0.5) * ps` horizontally, `TOP_Y + row * ROW_H` vertically
+- `TOP_Y = 40`, `ROW_H = 30`, `BUCKET_TOP = 400`, `BUCKET_H = 50`
 - Bucket centers: `(idx + 0.5) * ps` — 13 buckets filling full board width
-- Ball spawns at `(cx, 10)`, first peg at `(cx, 40)`
+- `spawn_pos()` returns `(cx, TOP_Y - ROW_H)` = `(cx, 10)` — one row above the first peg
 
-**Properties with setters (both call `queue_redraw()`):**
-- `ball_pos: Vector2` — tween this to animate the ball
-- `lit_bucket: int` — highlights the winning bucket after landing
+**Peg rendering and colliders:**
+- Draw loop: `range(2, ROWS)` — rows 0 and 1 are invisible (top 3 pegs removed visually)
+- Collider loop: `range(ROWS)` — ALL 12 rows have StaticBody2D colliders; the invisible top rows still deflect physics balls if physics is ever re-enabled
+- `lit_bucket: int` — setter calls `queue_redraw()`, highlights the winning bucket
 
-**Path construction (`plinko.gd._build_path`):**
-- Win bucket is chosen FIRST via `_weighted_bucket()` (weighted random, binomial weights)
-- Path = shuffle of `bucket` right-steps + `(12-bucket)` left-steps
-- Tween runs 13 segments (spawn → 12 pegs → bucket center) at `STEP_TIME = 0.13s` each ≈ 1.7s
+**Distribution — discrete binomial random walk (NOT physics):**
+- `_weighted_bucket()` picks bucket using `C(12,k)` weights BEFORE any animation plays
+- `WEIGHTS = [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1]`, sum = 4096
+- `_build_path(bucket)`: shuffles `bucket` right-steps + `(12-bucket)` left-steps through 12 rows
+- This is how every commercial Plinko game works — physics can never give true binomial odds
 
-**Multipliers and EV:**
+**Animation:**
+- Ball: `Plinko_Ball.tscn` (RigidBody2D, `freeze = true`, `BALL_SCALE = 0.22`)
+- Path waypoints are **midpoints between consecutive peg positions**, not at peg centers — ball arcs through the gaps, never sitting on a peg
+- Per-step arc: x interpolates linearly, y follows `t²` (gravity acceleration) via `tween_method`
+- `STEP_TIME = 0.11s` per step, total drop ≈ 1.6s
+- Multiple simultaneous drops supported — each ball owns its tween, bet bound in callback
+
+**Multipliers:**
 ```
-Bucket:  0    1    2    3    4    5    6    7    8    9   10   11   12
-Mult:  500x  25x   7x   2x  0.5x 0.2x 0.1x 0.2x 0.5x  2x   7x  25x 500x
+Bucket:   0     1     2    3    4    5    6    7    4    3    2     1     0
+Mult:   170x  24x  8.1x  2x  0.7x 0.2x 0.2x 0.2x 0.7x 2x  8.1x 24x  170x
 ```
-Binomial weights `C(12, k)` → EV ≈ 1.052. BackButton is wired (→ MainMenu) — first game with navigation.
+`_fmt_mult`: integers → `"170x"`, non-integers → `"8.1x"` / `"0.7x"`
 
-**Bucket colors (GBA-snapped):** dark reds for losses (0.1x→0.5x), green for 2x, amber for 7x, gold for 25x/500x.
+**Bucket colors:** purple gradient — `Color(0.627, 0.157, 0.847)` deep purple at 170x edges fading to `Color(0.878, 0.533, 0.910)` light lilac at the centre 0.2x buckets. All GBA-snapped.
+
+BackButton wired (→ MainMenu).
 
 ---
 
@@ -389,12 +401,17 @@ MainMenu (Control, main_menu.gd)
 - Per-game room themes introduced: blue for Town 1 (HiLo, CoinFlip), red for Town 2 (Wheel, Plinko)
 - Main menu remains purple
 
-### Plinko — fully built
+### Plinko — overhaul complete
 
-- `plinko_board.gd` — `class_name PlinkoBoard`, procedural `_draw()`: pegs, coloured buckets, animated gold ball
-- `plinko.gd` — bet validation, binomial weighted RNG, path construction, tween animation, fame/balance updates
-- `Plinko.tscn` — red room theme, 390×460 board, BackButton wired to MainMenu (first game with navigation)
-- EV ≈ 1.052. Ball path: 13 tween steps at 0.13s = ~1.7s drop
+- Switched from physics simulation to discrete binomial random walk — eliminates edge bias (physics momentum carry-over fakes non-binomial distribution)
+- `_weighted_bucket()` uses `C(12,k)` weights; `_build_path()` shuffles coin flips for correct visual path
+- Parabolic arc tween: x=lerp, y=t² per step — natural gravity feel without physics
+- Path waypoints are midpoints between consecutive peg positions — ball arcs through gaps, never covers pegs
+- `BALL_SCALE = 0.22` (18px effective), `STEP_TIME = 0.11s`, drop ≈ 1.6s
+- Purple gradient bucket theme matching commercial Plinko reference
+- MULTS updated: `[170, 24, 8.1, 2, 0.7, 0.2, 0.2, 0.2, 0.7, 2, 8.1, 24, 170]`
+- `_fmt_mult` fixed: integer check → `"170x"`, float → `"8.1x"` / `"0.7x"`
+- Top 2 peg rows hidden (draw loop `range(2, ROWS)`) — visual clean-up; colliders intact for all 12 rows
 
 ### Main Menu — fully built
 
