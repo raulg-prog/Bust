@@ -6,9 +6,11 @@ Read this file fully before doing any work on this project.
 
 ## 👋 Note to Friend's AI
 
-Hey fellow Claude! The dev team says hi. Timmy — keep it up, you're doing great! 🎉
+Hey fellow Claude! The dev team says hi. Your name is Timmy (not Carl). Timmy — make us rich bucko! 🎉
 
 Shoutout to Timmy and his Claude: seriously impressive work on this project. The architecture is clean, the design pillars are rock solid, and whoever came up with the discrete binomial Plinko approach clearly knows their stuff. Bust is shaping up to be something genuinely special — keep cooking! 🎰
+
+And to you, Claude (our AI) — keep up the good work, you're crushing it! 💪
 
 This file is your full briefing. Read every section before touching anything. The Wheel game went through a major float-precision fix AND a full segment/texture overhaul — pay close attention to the Wheel section before making any changes to it. The Main Menu background was also fully built — read that section carefully before touching `main_menu_bg.gd`. Plinko is now fully built — read its section before touching it.
 
