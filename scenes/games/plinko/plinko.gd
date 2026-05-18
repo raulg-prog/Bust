@@ -6,15 +6,16 @@ const ROWS      : int   = 12
 const BUCKETS   : int   = 13
 const STEP_TIME : float = 0.13
 
+# Ball PNG is 80×80px — scale to ~14px display diameter on the 30px grid.
+const BALL_SCENE = preload("res://scenes/games/plinko/Plinko_Ball.tscn")
+const BALL_SCALE : float = 0.18
+
 const MULTS : Array[float] = [
 	500.0, 25.0, 7.0, 2.0, 0.5, 0.2, 0.1,
 	0.2, 0.5, 2.0, 7.0, 25.0, 500.0
 ]
 # Binomial weights C(12, k) — sum = 4096 = 2^12
 const WEIGHTS : Array[int] = [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1]
-
-# Each drop gets a unique ID so its tween and result are fully independent.
-var _next_ball_id : int = 0
 
 @onready var board       : PlinkoBoard = %Board
 @onready var balance_lbl : Label       = %BalanceLabel
@@ -42,12 +43,14 @@ func _on_drop() -> void:
 		return
 	GameState.bankroll -= bet
 	_update_hud()
-	var bucket  := _weighted_bucket()
-	var path    := _build_path(bucket)
-	var ball_id := _next_ball_id
-	_next_ball_id += 1
-	board.set_ball(ball_id, path[0])
-	_animate_ball(ball_id, path, bucket, bet)
+	var bucket := _weighted_bucket()
+	var path   := _build_path(bucket)
+	var ball   := BALL_SCENE.instantiate() as RigidBody2D
+	ball.freeze    = true
+	ball.scale     = Vector2(BALL_SCALE, BALL_SCALE)
+	ball.position  = path[0]
+	board.add_child(ball)
+	_animate_ball(ball, path, bucket, bet)
 
 
 # Weighted random bucket index matching binomial(12, 0.5) distribution.
@@ -81,19 +84,15 @@ func _build_path(bucket: int) -> Array[Vector2]:
 	return path
 
 
-func _animate_ball(ball_id: int, path: Array[Vector2], bucket: int, bet: float) -> void:
+func _animate_ball(ball: RigidBody2D, path: Array[Vector2], bucket: int, bet: float) -> void:
 	var tw := create_tween()
 	for i in range(1, path.size()):
-		# tween_method lets each ball own its position independently.
-		tw.tween_method(
-			func(pos: Vector2) -> void: board.set_ball(ball_id, pos),
-			path[i - 1], path[i], STEP_TIME
-		)
-	tw.tween_callback(_on_drop_complete.bind(ball_id, bucket, bet))
+		tw.tween_property(ball, "position", path[i], STEP_TIME)
+	tw.tween_callback(_on_drop_complete.bind(ball, bucket, bet))
 
 
-func _on_drop_complete(ball_id: int, bucket: int, bet: float) -> void:
-	board.remove_ball(ball_id)
+func _on_drop_complete(ball: RigidBody2D, bucket: int, bet: float) -> void:
+	ball.queue_free()
 	board.lit_bucket = bucket
 	var mult   := MULTS[bucket]
 	var payout := bet * mult

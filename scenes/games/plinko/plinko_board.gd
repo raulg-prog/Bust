@@ -9,7 +9,6 @@ const ROW_H      : float = 30.0
 const BUCKET_TOP : float = 400.0
 const BUCKET_H   : float = 50.0
 const PEG_R      : float = 6.0
-const BALL_R     : float = 7.0
 
 const MULTS : Array[float] = [
 	500.0, 25.0, 7.0, 2.0, 0.5, 0.2, 0.1,
@@ -33,14 +32,11 @@ const BUCKET_COLORS : Array[Color] = [
 	Color(0.973, 0.847, 0.188, 1.0),  # 500x — full gold
 ]
 
-const PEG_TEX  = preload("res://Assets/Plinko/Asset 1 peg.png")
-const BALL_TEX = preload("res://Assets/Plinko/Asset 2 ball.png")
+const PEG_TEX = preload("res://Assets/Plinko/Asset 1 peg.png")
 
 const COL_EDGE := Color(0.000, 0.000, 0.000, 0.600)
 const COL_LBL  := Color(0.973, 0.973, 0.973, 1.0)
 
-# Each active drop gets its own entry: ball_id → Vector2 position.
-var balls      : Dictionary = {}
 var lit_bucket : int = -1:
 	set(v): lit_bucket = v; queue_redraw()
 
@@ -74,24 +70,14 @@ func _build_peg_colliders() -> void:
 	# One StaticBody2D + CircleShape2D per peg — visible in Godot's collision overlay.
 	for row in range(ROWS):
 		for col in range(row + 1):
-			var sb  := StaticBody2D.new()
+			var sb   := StaticBody2D.new()
 			sb.position = peg_pos(row, col)
-			var cs  := CollisionShape2D.new()
+			var cs   := CollisionShape2D.new()
 			var circ := CircleShape2D.new()
 			circ.radius = PEG_R
 			cs.shape = circ
 			sb.add_child(cs)
 			add_child(sb)
-
-
-func set_ball(id: int, pos: Vector2) -> void:
-	balls[id] = pos
-	queue_redraw()
-
-
-func remove_ball(id: int) -> void:
-	balls.erase(id)
-	queue_redraw()
 
 
 func _draw() -> void:
@@ -115,10 +101,6 @@ func _draw() -> void:
 				Vector2(bx, BUCKET_TOP + 32.0),
 				_fmt_mult(MULTS[i]),
 				HORIZONTAL_ALIGNMENT_CENTER, ps, 10, COL_LBL)
-	# All active balls
-	var bd := BALL_R * 2.0
-	for pos in balls.values():
-		draw_texture_rect(BALL_TEX, Rect2(pos - Vector2(BALL_R, BALL_R), Vector2(bd, bd)), false)
 
 
 func peg_pos(row: int, col: int) -> Vector2:

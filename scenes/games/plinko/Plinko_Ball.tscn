@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bogw4bqfjm21d"]
+
+[ext_resource type="Texture2D" uid="uid://c50g1pueql1jr" path="res://Assets/Plinko/Asset 2 ball.png" id="1_vb1pe"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vb1pe"]
+radius = 43.046486
+
+[node name="PlinkoBall" type="RigidBody2D" unique_id=554678456]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2033733084]
+texture = ExtResource("1_vb1pe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=615447902]
+shape = SubResource("CircleShape2D_vb1pe")
+debug_color = Color(0.99429446, 0, 0.2316181, 0.41960785)
