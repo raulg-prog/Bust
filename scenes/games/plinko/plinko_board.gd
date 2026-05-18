@@ -1,3 +1,4 @@
+@tool
 class_name PlinkoBoard
 extends Control
 
@@ -7,8 +8,7 @@ const TOP_Y      : float = 40.0
 const ROW_H      : float = 30.0
 const BUCKET_TOP : float = 400.0
 const BUCKET_H   : float = 50.0
-const PEG_R      : float = 4.0
-const BALL_R     : float = 8.0
+const PEG_R      : float = 6.0
 
 const MULTS : Array[float] = [
 	500.0, 25.0, 7.0, 2.0, 0.5, 0.2, 0.1,
@@ -32,23 +32,62 @@ const BUCKET_COLORS : Array[Color] = [
 	Color(0.973, 0.847, 0.188, 1.0),  # 500x — full gold
 ]
 
-const COL_PEG  := Color(0.816, 0.816, 0.816, 1.0)
-const COL_BALL := Color(0.973, 0.847, 0.188, 1.0)
+const PEG_TEX = preload("res://Assets/Plinko/Asset 1 peg.png")
+
 const COL_EDGE := Color(0.000, 0.000, 0.000, 0.600)
 const COL_LBL  := Color(0.973, 0.973, 0.973, 1.0)
 
-var ball_pos   : Vector2 = Vector2(-999.0, -999.0):
-	set(v): ball_pos = v; queue_redraw()
 var lit_bucket : int = -1:
 	set(v): lit_bucket = v; queue_redraw()
+
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
+	# Wait for layout to settle so size.x is valid before placing colliders.
+	await get_tree().process_frame
+	_build_peg_colliders()
+
+
+func _notification(what: int) -> void:
+	# Re-draw and rebuild colliders whenever the control is resized (fires in editor too).
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
+		if Engine.is_editor_hint() and size.x > 0.0:
+			_build_peg_colliders()
+
+
+func _build_peg_colliders() -> void:
+	if size.x <= 0.0:
+		return
+	# Collect then free any previously built bodies (safe mid-iteration pattern).
+	var old : Array = []
+	for child in get_children():
+		if child is StaticBody2D:
+			old.append(child)
+	for body in old:
+		body.free()
+	# One StaticBody2D + CircleShape2D per peg — visible in Godot's collision overlay.
+	for row in range(ROWS):
+		for col in range(row + 1):
+			var sb   := StaticBody2D.new()
+			sb.position = peg_pos(row, col)
+			var cs   := CollisionShape2D.new()
+			var circ := CircleShape2D.new()
+			circ.radius = PEG_R
+			cs.shape = circ
+			sb.add_child(cs)
+			add_child(sb)
 
 
 func _draw() -> void:
 	var ps := _ps()
 	# Pegs — row r has (r+1) pegs, centred horizontally
+	var pd := PEG_R * 2.0
 	for row in range(ROWS):
 		for col in range(row + 1):
-			draw_circle(peg_pos(row, col), PEG_R, COL_PEG)
+			var pp := peg_pos(row, col)
+			draw_texture_rect(PEG_TEX, Rect2(pp - Vector2(PEG_R, PEG_R), Vector2(pd, pd)), false)
 	# Buckets
 	var font := ThemeDB.fallback_font
 	for i in range(BUCKETS):
@@ -62,9 +101,6 @@ func _draw() -> void:
 				Vector2(bx, BUCKET_TOP + 32.0),
 				_fmt_mult(MULTS[i]),
 				HORIZONTAL_ALIGNMENT_CENTER, ps, 10, COL_LBL)
-	# Ball
-	if ball_pos.x >= 0.0:
-		draw_circle(ball_pos, BALL_R, COL_BALL)
 
 
 func peg_pos(row: int, col: int) -> Vector2:
