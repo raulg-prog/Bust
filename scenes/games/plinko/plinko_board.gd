@@ -9,7 +9,7 @@ const ROW_H      : float = 30.0
 const BUCKET_TOP : float = 400.0
 const BUCKET_H   : float = 50.0
 const PEG_R      : float = 6.0
-const BALL_R     : float = 10.0
+const BALL_R     : float = 7.0
 
 const MULTS : Array[float] = [
 	500.0, 25.0, 7.0, 2.0, 0.5, 0.2, 0.1,
