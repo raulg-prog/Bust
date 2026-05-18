@@ -13,10 +13,8 @@ const MULTS : Array[float] = [
 # Binomial weights C(12, k) — sum = 4096 = 2^12
 const WEIGHTS : Array[int] = [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1]
 
-# Tracks the in-flight animation so a new DROP can kill it and settle instantly.
-var _active_tween   : Tween = null
-var _pending_bucket : int   = -1
-var _pending_bet    : float = 0.0
+# Each drop gets a unique ID so its tween and result are fully independent.
+var _next_ball_id : int = 0
 
 @onready var board       : PlinkoBoard = %Board
 @onready var balance_lbl : Label       = %BalanceLabel
@@ -35,11 +33,6 @@ func _ready() -> void:
 
 
 func _on_drop() -> void:
-	# If a ball is mid-air, kill the tween and settle that bet instantly.
-	if _active_tween != null:
-		_active_tween.kill()
-		_active_tween = null
-		_on_drop_complete(_pending_bucket, _pending_bet)
 	var bet := bet_input.text.to_float()
 	if bet < MIN_BET:
 		result_lbl.text = "Minimum bet: $%s" % _fmt(MIN_BET)
@@ -49,15 +42,12 @@ func _on_drop() -> void:
 		return
 	GameState.bankroll -= bet
 	_update_hud()
-	result_lbl.text = ""
-	result_lbl.remove_theme_color_override("font_color")
-	var bucket := _weighted_bucket()
-	var path   := _build_path(bucket)
-	_pending_bucket  = bucket
-	_pending_bet     = bet
-	board.lit_bucket = -1
-	board.ball_pos   = path[0]
-	_active_tween    = _animate(path, bucket, bet)
+	var bucket  := _weighted_bucket()
+	var path    := _build_path(bucket)
+	var ball_id := _next_ball_id
+	_next_ball_id += 1
+	board.set_ball(ball_id, path[0])
+	_animate_ball(ball_id, path, bucket, bet)
 
 
 # Weighted random bucket index matching binomial(12, 0.5) distribution.
@@ -91,16 +81,20 @@ func _build_path(bucket: int) -> Array[Vector2]:
 	return path
 
 
-func _animate(path: Array[Vector2], bucket: int, bet: float) -> Tween:
+func _animate_ball(ball_id: int, path: Array[Vector2], bucket: int, bet: float) -> void:
 	var tw := create_tween()
 	for i in range(1, path.size()):
-		tw.tween_property(board, "ball_pos", path[i], STEP_TIME)
-	tw.tween_callback(_on_drop_complete.bind(bucket, bet))
-	return tw
+		# tween_method lets each ball own its position independently.
+		tw.tween_method(
+			func(pos: Vector2) -> void: board.set_ball(ball_id, pos),
+			path[i - 1], path[i], STEP_TIME
+		)
+	tw.tween_callback(_on_drop_complete.bind(ball_id, bucket, bet))
 
 
-func _on_drop_complete(bucket: int, bet: float) -> void:
-	_active_tween = null
+func _on_drop_complete(ball_id: int, bucket: int, bet: float) -> void:
+	board.remove_ball(ball_id)
+	board.lit_bucket = bucket
 	var mult   := MULTS[bucket]
 	var payout := bet * mult
 	var net    := payout - bet
@@ -108,7 +102,6 @@ func _on_drop_complete(bucket: int, bet: float) -> void:
 	if net > 0.0:
 		GameState.add_fame(TOWN_ID, net)
 	_update_hud()
-	board.lit_bucket = bucket
 
 	var mult_str := _fmt_mult(mult)
 	if net > 0.0:

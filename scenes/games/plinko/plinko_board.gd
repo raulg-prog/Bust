@@ -37,10 +37,20 @@ const COL_BALL := Color(0.973, 0.847, 0.188, 1.0)
 const COL_EDGE := Color(0.000, 0.000, 0.000, 0.600)
 const COL_LBL  := Color(0.973, 0.973, 0.973, 1.0)
 
-var ball_pos   : Vector2 = Vector2(-999.0, -999.0):
-	set(v): ball_pos = v; queue_redraw()
+# Each active drop gets its own entry: ball_id → Vector2 position.
+var balls      : Dictionary = {}
 var lit_bucket : int = -1:
 	set(v): lit_bucket = v; queue_redraw()
+
+
+func set_ball(id: int, pos: Vector2) -> void:
+	balls[id] = pos
+	queue_redraw()
+
+
+func remove_ball(id: int) -> void:
+	balls.erase(id)
+	queue_redraw()
 
 
 func _draw() -> void:
@@ -62,9 +72,9 @@ func _draw() -> void:
 				Vector2(bx, BUCKET_TOP + 32.0),
 				_fmt_mult(MULTS[i]),
 				HORIZONTAL_ALIGNMENT_CENTER, ps, 10, COL_LBL)
-	# Ball
-	if ball_pos.x >= 0.0:
-		draw_circle(ball_pos, BALL_R, COL_BALL)
+	# All active balls
+	for pos in balls.values():
+		draw_circle(pos, BALL_R, COL_BALL)
 
 
 func peg_pos(row: int, col: int) -> Vector2:
