@@ -1,3 +1,4 @@
+@tool
 class_name PlinkoBoard
 extends Control
 
@@ -42,6 +43,45 @@ const COL_LBL  := Color(0.973, 0.973, 0.973, 1.0)
 var balls      : Dictionary = {}
 var lit_bucket : int = -1:
 	set(v): lit_bucket = v; queue_redraw()
+
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
+	# Wait for layout to settle so size.x is valid before placing colliders.
+	await get_tree().process_frame
+	_build_peg_colliders()
+
+
+func _notification(what: int) -> void:
+	# Re-draw and rebuild colliders whenever the control is resized (fires in editor too).
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
+		if Engine.is_editor_hint() and size.x > 0.0:
+			_build_peg_colliders()
+
+
+func _build_peg_colliders() -> void:
+	if size.x <= 0.0:
+		return
+	# Collect then free any previously built bodies (safe mid-iteration pattern).
+	var old : Array = []
+	for child in get_children():
+		if child is StaticBody2D:
+			old.append(child)
+	for body in old:
+		body.free()
+	# One StaticBody2D + CircleShape2D per peg — visible in Godot's collision overlay.
+	for row in range(ROWS):
+		for col in range(row + 1):
+			var sb  := StaticBody2D.new()
+			sb.position = peg_pos(row, col)
+			var cs  := CollisionShape2D.new()
+			var circ := CircleShape2D.new()
+			circ.radius = PEG_R
+			cs.shape = circ
+			sb.add_child(cs)
+			add_child(sb)
 
 
 func set_ball(id: int, pos: Vector2) -> void:
