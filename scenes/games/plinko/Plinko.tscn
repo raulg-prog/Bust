@@ -1,18 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scenes/games/coinflip/coinflip.gd" id="1_coinflip"]
+[ext_resource type="Script" path="res://scenes/games/plinko/plinko.gd" id="1_plinko"]
+[ext_resource type="Script" path="res://scenes/games/plinko/plinko_board.gd" id="2_board"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.220, 0.345, 0.659, 1)
+bg_color = Color(0.659, 0.220, 0.220, 1)
 
-[node name="CoinFlip" type="Control"]
+[node name="Plinko" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_coinflip")
+script = ExtResource("1_plinko")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 3
@@ -21,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.031, 0.063, 0.188, 1)
+color = Color(0.157, 0.031, 0.031, 1)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 3
@@ -33,7 +34,7 @@ grow_vertical = 2
 
 [node name="GameArea" type="VBoxContainer" parent="Center"]
 layout_mode = 2
-custom_minimum_size = Vector2(640, 0)
+custom_minimum_size = Vector2(420, 0)
 theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Center/GameArea"]
@@ -41,7 +42,7 @@ layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
-text = "*  COIN FLIP  *"
+text = "*  PLINKO  *"
 
 [node name="TitleDivider" type="PanelContainer" parent="Center/GameArea"]
 layout_mode = 2
@@ -65,65 +66,14 @@ layout_mode = 2
 horizontal_alignment = 2
 theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.502, 0.753, 0.973, 1)
-text = "0 / 5,000 Fame"
+text = "0 / 25,000 Fame"
 
-[node name="CoinSprite" type="TextureRect" parent="Center/GameArea"]
+[node name="Board" type="Control" parent="Center/GameArea"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 290)
-texture_filter = 1
-stretch_mode = 5
-
-[node name="MultRow" type="HBoxContainer" parent="Center/GameArea"]
-layout_mode = 2
-
-[node name="MultLabel" type="Label" parent="Center/GameArea/MultRow"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.627, 0.627, 0.753, 1)
-text = "Multiplier:  "
-
-[node name="MultValue" type="Label" parent="Center/GameArea/MultRow"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
-text = "1.00x"
-
-[node name="SelectionRow" type="HBoxContainer" parent="Center/GameArea"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="HeadsButton" type="Button" parent="Center/GameArea/SelectionRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-modulate = Color(0.973, 0.847, 0.188, 1)
-text = "^  HEADS"
-
-[node name="FlipButton" type="Button" parent="Center/GameArea/SelectionRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-disabled = true
-modulate = Color(0.973, 0.816, 0.188, 1)
-text = "FLIP"
-
-[node name="TailsButton" type="Button" parent="Center/GameArea/SelectionRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-modulate = Color(0.502, 0.753, 0.973, 1)
-text = "v  TAILS"
-
-[node name="CashOutButton" type="Button" parent="Center/GameArea"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-disabled = true
-modulate = Color(0.973, 0.816, 0.188, 1)
-text = "CASH OUT"
+custom_minimum_size = Vector2(390, 460)
+size_flags_horizontal = 4
+script = ExtResource("2_board")
 
 [node name="ResultLabel" type="Label" parent="Center/GameArea"]
 unique_name_in_owner = true
@@ -151,7 +101,14 @@ custom_minimum_size = Vector2(120, 0)
 text = "100"
 placeholder_text = "Amount"
 
+[node name="DropButton" type="Button" parent="Center/GameArea/BetRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DROP"
+
 [node name="BackButton" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 1
 anchor_left = 0.0

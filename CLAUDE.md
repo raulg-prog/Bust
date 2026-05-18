@@ -8,7 +8,7 @@ Read this file fully before doing any work on this project.
 
 Hey fellow Claude! The dev team says hi. Timmy — keep it up, you're doing great! 🎉
 
-This file is your full briefing. Read every section before touching anything. The Wheel game went through a major float-precision fix — pay close attention to the Wheel section before making any changes to it. The Main Menu background was also fully built this session — read that section carefully before touching `main_menu_bg.gd`.
+This file is your full briefing. Read every section before touching anything. The Wheel game went through a major float-precision fix AND a full segment/texture overhaul — pay close attention to the Wheel section before making any changes to it. The Main Menu background was also fully built — read that section carefully before touching `main_menu_bg.gd`. Plinko is now fully built — read its section before touching it.
 
 ---
 
@@ -80,7 +80,8 @@ Bust/
 │   ├── Fonts/
 │   │   └── m5x7.ttf                # Pixel font (kept in assets, NOT used in theme)
 │   ├── Wheel/
-│   │   ├── Wheel.png               # Wheel image — 20 segments, centres at 12 o'clock multiples
+│   │   ├── Wheel.png               # Old wheel image — kept but not used
+│   │   ├── Wheel2.png              # Active wheel image — 20 segments, centres at 12 o'clock multiples
 │   │   └── SpinBtn.png             # Spin button image (green SPIN circle)
 │   └── Floor TIles/                # Tileset assets (not yet wired up)
 ├── autoloads/
@@ -97,10 +98,14 @@ Bust/
 │       ├── coinflip/
 │       │   ├── CoinFlip.tscn
 │       │   └── coinflip.gd
-│       └── wheel/
-│           ├── Wheel.tscn
-│           ├── wheel.gd            # Game logic + spin animation
-│           └── wheel_overlay.gd    # Draws the gold ▼ pointer triangle (no rotation)
+│       ├── wheel/
+│       │   ├── Wheel.tscn
+│       │   ├── wheel.gd            # Game logic + spin animation
+│       │   └── wheel_overlay.gd    # Draws the gold ▼ pointer triangle (no rotation)
+│       └── plinko/
+│           ├── Plinko.tscn
+│           ├── plinko.gd           # Game logic + ball animation
+│           └── plinko_board.gd     # class_name PlinkoBoard — procedural _draw() renderer
 ├── default_theme.tres              # Global theme: system font at 16px (m5x7 removed)
 └── project.godot                   # Main scene: MainMenu.tscn
 ```
@@ -180,18 +185,56 @@ Other spin notes:
 - Two `await get_tree().process_frame` in `_ready()` before `_sync_pivot()` — needed so nested layout is fully computed
 - `_sync_pivot()` uses `pivot_marker.position` (local coords) to set `wheel_image.pivot_offset`
 
-**SEGMENTS array (indices 0–19, clockwise from 12 o'clock):**
+**SEGMENTS array (indices 0–19, clockwise from 12 o'clock) — matches Wheel2.png:**
 ```
-0: Spin Again (1.0)   1: 3x     2: 0.1x   3: 0.5x   4: 0.25x
-5: 5x                 6: 0.1x   7: 0.25x  8: 2x     9: 0.1x
-10: Spin Again (1.0)  11: 0.1x  12: 3x    13: 0.5x  14: 0.25x
-15: 0x                16: 0.5x  17: 0.1x  18: 2x    19: 0.25x
+0: Spin Again (1.0)   1: 0.5x   2: 1x    3: 0.5x   4: 0x (Bust)
+5: 0.5x               6: 2x     7: 0.5x  8: 1x     9: 0x (Bust)
+10: Spin Again (1.0)  11: 0.5x  12: 10x  13: 0.5x  14: 0x (Bust)
+15: 0.5x              16: 2x    17: 0.5x 18: 1x    19: 0x (Bust)
 ```
-EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — corrected this session.
+EV = 1.15 (5×1 + 8×0.5 + 2×2 + 1×10 + 4×0) / 20 = 23/20.
+
+**Spin Again vs 1x — do not confuse:**
+- `SPIN_AGAIN_IDX: Array[int] = [0, 10]` — only these indices auto-respin after landing
+- Indices 2, 8, 18 are `1x` — return the bet but stop spinning (player sees result)
+- Check by index, NOT by `mult == 1.0`, since both 1x and Spin Again have mult=1.0
 
 **Font:** m5x7 was removed from the project theme entirely. System font is used. All Unicode icons (★ ♠ ▼ ←) replaced with ASCII equivalents (* ^ v <) in all scenes.
 
 **Note:** `claim_wheel_spin()` in `game_state.gd` is the **safety-net free spin** (4-hour cooldown) — completely separate from this betting game.
+
+### Plinko (`scenes/games/plinko/`)
+
+Single-bet Galton board. Player enters a bet and clicks DROP. The gold ball falls through 12 rows of pegs and lands in one of 13 buckets. Payout = bet × bucket multiplier.
+
+**Architecture — two-script design:**
+- `plinko_board.gd` (`class_name PlinkoBoard`, extends Control) — pure renderer, no game logic
+- `plinko.gd` — game logic only; drives the board via its public API
+
+**Board geometry (all in `plinko_board.gd`):**
+- 12 rows × (row+1) pegs — row 0 has 1 peg, row 11 has 12 pegs
+- Peg spacing `_ps() = size.x / 13` — adapts to control width (designed for 390px → 30px/col)
+- Peg position: `cx + (col - row * 0.5) * ps` horizontally, `TOP_Y + row * ROW_H` vertically
+- Bucket centers: `(idx + 0.5) * ps` — 13 buckets filling full board width
+- Ball spawns at `(cx, 10)`, first peg at `(cx, 40)`
+
+**Properties with setters (both call `queue_redraw()`):**
+- `ball_pos: Vector2` — tween this to animate the ball
+- `lit_bucket: int` — highlights the winning bucket after landing
+
+**Path construction (`plinko.gd._build_path`):**
+- Win bucket is chosen FIRST via `_weighted_bucket()` (weighted random, binomial weights)
+- Path = shuffle of `bucket` right-steps + `(12-bucket)` left-steps
+- Tween runs 13 segments (spawn → 12 pegs → bucket center) at `STEP_TIME = 0.13s` each ≈ 1.7s
+
+**Multipliers and EV:**
+```
+Bucket:  0    1    2    3    4    5    6    7    8    9   10   11   12
+Mult:  500x  25x   7x   2x  0.5x 0.2x 0.1x 0.2x 0.5x  2x   7x  25x 500x
+```
+Binomial weights `C(12, k)` → EV ≈ 1.052. BackButton is wired (→ MainMenu) — first game with navigation.
+
+**Bucket colors (GBA-snapped):** dark reds for losses (0.1x→0.5x), green for 2x, amber for 7x, gold for 25x/500x.
 
 ---
 
@@ -212,15 +255,23 @@ EV = 1.0 exactly. Indices 16–19 were a cyclic mismatch vs the old array — co
 
 - GBA pixel art aesthetic — flat colors, hard edges, limited palette
 - UI panels use `StyleBoxFlat` with `corner_radius = 0` (no rounding) and a 2–3px border
-- Color palette:
-  - Background: `Color(0.039, 0.027, 0.094)` — deep dark purple
-  - Panel bg: `Color(0.067, 0.047, 0.157)`
-  - Panel border: `Color(0.31, 0.239, 0.565)`
-  - Balance text: `Color(0.4, 1.0, 0.5)` — bright green
-  - Fame text: `Color(0.5, 0.78, 1.0)` — bright blue
-  - Multiplier/title: `Color(1.0, 0.878, 0.2)` — gold
-  - Result text: `Color(1.0, 1.0, 0.45)` — yellow
-  - Dim labels: `Color(0.65, 0.65, 0.78)` — muted purple-gray
+- **All RGB values are GBA 15-bit snapped** — each channel = `(n * 8) / 255` for integer n ∈ [0, 31]
+  - Formula: `gba_val = round(target * 31)`, `godot_float = gba_val * 8 / 255`
+  - Max white = 31/31 = `248/255 ≈ 0.973` — never use 1.0 for "white"
+
+**Semantic colors (GBA-snapped, used across all games):**
+- Balance text: `Color(0.376, 0.973, 0.502, 1)` — bright green (win)
+- Fame text: `Color(0.502, 0.753, 0.973, 1)` — bright blue
+- Title / gold: `Color(0.973, 0.847, 0.188, 1)` — gold
+- Result yellow: `Color(0.973, 0.973, 0.439, 1)` — neutral result
+- Win green: `Color(0.376, 0.973, 0.502, 1)` — positive outcome
+- Loss red: `Color(0.973, 0.376, 0.376, 1)` — negative outcome
+- Dim labels: `Color(0.627, 0.627, 0.753, 1)` — muted purple-gray
+
+**Per-game room themes (background + accent divider):**
+- **Town 1 — Blue room** (HiLo, CoinFlip): bg `Color(0.031, 0.063, 0.188, 1)` · accent `Color(0.220, 0.345, 0.659, 1)`
+- **Town 2 — Red room** (Wheel, Plinko): bg `Color(0.157, 0.031, 0.031, 1)` · accent `Color(0.659, 0.220, 0.220, 1)`
+- Main Menu stays purple: bg uses procedural tilemap · panel border `Color(0.314, 0.220, 0.565, 1)`
 
 ---
 
@@ -299,8 +350,8 @@ MainMenu (Control, main_menu.gd)
 ## What's Not Built Yet
 
 - Overworld / town scenes
-- Town 2–5 remaining games (Plinko, Roulette, Dice, Mines, Tower, Slots)
-- Scene navigation / BackButton wiring
+- Town 2–5 remaining games (Roulette, Dice, Mines, Tower, Slots)
+- Scene navigation / BackButton wiring for HiLo, CoinFlip, Wheel (Plinko has it wired)
 - Multiplayer card rooms
 - Wheel of Fortune UI (safety-net free spin — separate from the Wheel betting game)
 - Save/load system
@@ -320,9 +371,30 @@ MainMenu (Control, main_menu.gd)
 - `wheel_overlay.gd` draws gold pointer triangle, 12px above wheel top edge
 - `WheelContainer` locked in editor (`metadata/_edit_lock_ = true`)
 - `randomize()` called in `_ready()` for proper RNG seeding
-- SEGMENTS array corrected — indices 16–19 had a cyclic shift vs PNG (now fixed)
 - Landing formula: `land_r = -float(win_idx) * seg_angle` (no +0.5 for this PNG)
 - **Float-precision bug fully resolved**: `wheel_exact_rot` canonical variable + `wheel_image.rotation = start_r` before tween. See Spin Math section above for full details.
+
+### Wheel overhaul — Wheel2.png + new segments
+
+- Switched texture from `Wheel.png` to `Wheel2.png` in `Wheel.tscn`
+- New SEGMENTS array to match Wheel2.png layout (see Wheel section above)
+- `SPIN_AGAIN_IDX: Array[int] = [0, 10]` — 1x segments no longer auto-respin
+- `_on_spin_complete` checks `if win_idx in SPIN_AGAIN_IDX` (not `mult == 1.0`)
+- 0x result text changed to "0x  -$X" (was "No win — -$X")
+- Deleted orphaned files: `wheel_draw.gd`, `wheel_clip.gdshader`, their `.uid` files
+
+### GBA 15-bit color palette — applied across all files
+
+- Every RGB color value in all `.tscn` and `.gd` files snapped to GBA 15-bit (n×8/255, n ∈ 0–31)
+- Per-game room themes introduced: blue for Town 1 (HiLo, CoinFlip), red for Town 2 (Wheel, Plinko)
+- Main menu remains purple
+
+### Plinko — fully built
+
+- `plinko_board.gd` — `class_name PlinkoBoard`, procedural `_draw()`: pegs, coloured buckets, animated gold ball
+- `plinko.gd` — bet validation, binomial weighted RNG, path construction, tween animation, fame/balance updates
+- `Plinko.tscn` — red room theme, 390×460 board, BackButton wired to MainMenu (first game with navigation)
+- EV ≈ 1.052. Ball path: 13 tween steps at 0.13s = ~1.7s drop
 
 ### Main Menu — fully built
 
@@ -332,6 +404,5 @@ MainMenu (Control, main_menu.gd)
 - All tile colours matched to Pokémon FireRed/LeafGreen Four Island reference
 
 ### Next up
-- Scene navigation / BackButton wiring (all game scenes need a back button to return to menu)
-- Next game: **Plinko** (Town 2, alongside Wheel)
+- Wire BackButton in HiLo, CoinFlip, Wheel (copy pattern from Plinko)
 - Eventually: overworld map scene to replace the direct HiLo temp load in `main_menu.gd`

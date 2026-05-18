@@ -59,9 +59,9 @@ func _select(side: int) -> void:
 
 
 func _refresh_selection() -> void:
-	var gold := Color(1.0, 0.878, 0.2, 1)
-	var blue := Color(0.5, 0.78,  1.0, 1)
-	var dim  := Color(1.0, 1.0,   1.0, 0.3)
+	var gold := Color(0.973, 0.847, 0.188, 1)
+	var blue := Color(0.502, 0.753, 0.973, 1)
+	var dim  := Color(0.973, 0.973, 0.973, 0.3)
 	match selected_side:
 		0:
 			heads_btn.modulate = gold
@@ -172,7 +172,7 @@ func _apply_state(new_state: State) -> void:
 		_show_strip_frame(HEADS_FRAME_IDX if last_landed_heads else TAILS_FRAME_IDX)
 
 	_refresh_selection()
-	flip_btn.modulate = Color(1.0, 0.85, 0.2, 1) if not flipping else Color(0.55, 0.55, 0.55, 1)
+	flip_btn.modulate = Color(0.973, 0.816, 0.188, 1) if not flipping else Color(0.533, 0.533, 0.533, 1)
 
 
 func _update_hud() -> void:

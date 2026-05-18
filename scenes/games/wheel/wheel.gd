@@ -4,31 +4,35 @@ const TOWN_ID  := 1
 const MIN_BET  := 10.0
 const SPIN_REV := 6   # full rotations added before landing
 
-# Segments clockwise from 12 o'clock — must match the wheel image exactly
-# 1.0 = Spin Again (return bet, free re-spin, no Fame change)
-# EV = 1.0: 2(1)+2(3)+1(5)+2(2)+3(0.5)+4(0.25)+5(0.1)+1(0) / 20 = 1.0
+# Segments clockwise from 12 o'clock — must match Wheel2.png exactly
+# 1.0 = Spin Again or 1x (return bet + free re-spin, no Fame change)
+# Bust segments every 5th position (4, 9, 14, 19) — evenly spaced
+# EV = 1.15: 5(1)+8(0.5)+2(2)+1(10)+4(0) / 20 = 23/20
 const SEGMENTS: Array[float] = [
-	1.0,   # 0  Spin Again
-	3.0,   # 1  3x
-	0.1,   # 2  0.1x
+	1.0,   # 0  Spin Again  (12:00)
+	0.5,   # 1  0.5x
+	1.0,   # 2  1x
 	0.5,   # 3  0.5x
-	0.25,  # 4  0.25x
-	5.0,   # 5  5x
-	0.1,   # 6  0.1x
-	0.25,  # 7  0.25x
-	2.0,   # 8  2x
-	0.1,   # 9  0.1x
-	1.0,   # 10 Spin Again
-	0.1,   # 11 0.1x
-	3.0,   # 12 3x
+	0.0,   # 4  Bust
+	0.5,   # 5  0.5x        (3:00)
+	2.0,   # 6  2x
+	0.5,   # 7  0.5x
+	1.0,   # 8  1x
+	0.0,   # 9  Bust
+	1.0,   # 10 Spin Again  (6:00)
+	0.5,   # 11 0.5x
+	10.0,  # 12 Jackpot 10x
 	0.5,   # 13 0.5x
-	0.25,  # 14 0.25x
-	0.0,   # 15 0x
-	0.5,   # 16 0.5x
-	0.1,   # 17 0.1x
-	2.0,   # 18 2x
-	0.25,  # 19 0.25x
+	0.0,   # 14 Bust
+	0.5,   # 15 0.5x        (9:00)
+	2.0,   # 16 2x
+	0.5,   # 17 0.5x
+	1.0,   # 18 1x
+	0.0,   # 19 Bust
 ]
+
+# Only these indices trigger auto-respin — 1x segments return the bet but stop.
+const SPIN_AGAIN_IDX: Array[int] = [0, 10]
 
 enum State { IDLE, SPINNING }
 
@@ -111,8 +115,8 @@ func _on_spin_complete(win_idx: int, mult: float) -> void:
 	# Snap the visual to the exact segment centre — corrects any tween float residual.
 	wheel_image.rotation = wheel_exact_rot
 
-	if mult == 1.0:
-		result_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.45, 1))
+	if win_idx in SPIN_AGAIN_IDX:
+		result_label.add_theme_color_override("font_color", Color(0.973, 0.973, 0.439, 1))
 		result_label.text = "Spin Again!"
 		await get_tree().create_timer(0.7).timeout
 		result_label.text = ""
@@ -123,15 +127,18 @@ func _on_spin_complete(win_idx: int, mult: float) -> void:
 	var delta := current_bet * (mult - 1.0)
 	GameState.bankroll += delta
 
-	if mult > 1.0:
+	if mult == 1.0:
+		result_label.add_theme_color_override("font_color", Color(0.973, 0.973, 0.439, 1))
+		result_label.text = "1x  —  bet returned"
+	elif mult > 1.0:
 		GameState.add_fame(TOWN_ID, delta)
-		result_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5, 1))
+		result_label.add_theme_color_override("font_color", Color(0.376, 0.973, 0.502, 1))
 		result_label.text = "+$%s  (%s)" % [_fmt(delta), _mult_str(mult)]
 	elif mult == 0.0:
-		result_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 1))
-		result_label.text = "No win  —  -$%s" % _fmt(current_bet)
+		result_label.add_theme_color_override("font_color", Color(0.973, 0.376, 0.376, 1))
+		result_label.text = "0x  —  -$%s" % _fmt(current_bet)
 	else:
-		result_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 1))
+		result_label.add_theme_color_override("font_color", Color(0.973, 0.376, 0.376, 1))
 		result_label.text = "%s  —  -$%s" % [_mult_str(mult), _fmt(-delta)]
 
 	state             = State.IDLE

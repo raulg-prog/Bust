@@ -9,7 +9,7 @@ func _draw() -> void:
 			Vector2(cx + 13.0, -12.0),
 			Vector2(cx,          8.0),
 		]),
-		Color(1.0, 0.878, 0.2, 1.0)
+		Color(0.973, 0.847, 0.188, 1.0)
 	)
 	# Thin dark outline so the pointer is visible over light segments.
 	draw_polyline(

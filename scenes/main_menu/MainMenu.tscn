@@ -4,8 +4,8 @@
 [ext_resource type="Script" path="res://scenes/main_menu/main_menu_bg.gd" id="2_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.039, 0.027, 0.094, 0.90)
-border_color = Color(0.31, 0.239, 0.565, 1)
+bg_color = Color(0.031, 0.031, 0.094, 0.90)
+border_color = Color(0.314, 0.220, 0.565, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -16,11 +16,11 @@ content_margin_right = 32.0
 content_margin_bottom = 32.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.31, 0.239, 0.565, 1)
+bg_color = Color(0.314, 0.220, 0.565, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.067, 0.047, 0.157, 1)
-border_color = Color(0.31, 0.239, 0.565, 1)
+bg_color = Color(0.063, 0.031, 0.157, 1)
+border_color = Color(0.314, 0.220, 0.565, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -31,8 +31,8 @@ content_margin_right = 12.0
 content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.118, 0.082, 0.235, 1)
-border_color = Color(1.0, 0.878, 0.2, 1)
+bg_color = Color(0.125, 0.094, 0.220, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -43,8 +43,8 @@ content_margin_right = 12.0
 content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.196, 0.137, 0.353, 1)
-border_color = Color(1.0, 0.878, 0.2, 1)
+bg_color = Color(0.188, 0.125, 0.345, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -102,14 +102,14 @@ theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Center/MenuPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
 theme_override_font_sizes/font_size = 60
 text = "BUST"
 horizontal_alignment = 1
 
 [node name="SubLabel" type="Label" parent="Center/MenuPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.65, 0.78, 1)
+theme_override_colors/font_color = Color(0.627, 0.627, 0.753, 1)
 theme_override_font_sizes/font_size = 15
 text = "A Gambling Adventure"
 horizontal_alignment = 1
@@ -128,9 +128,9 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.9, 0.9, 1.0, 1)
-theme_override_colors/font_hover_color = Color(1.0, 0.878, 0.2, 1)
-theme_override_colors/font_pressed_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_colors/font_color = Color(0.878, 0.878, 0.973, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -142,9 +142,9 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.9, 0.9, 1.0, 1)
-theme_override_colors/font_hover_color = Color(1.0, 0.878, 0.2, 1)
-theme_override_colors/font_pressed_color = Color(1.0, 0.878, 0.2, 1)
+theme_override_colors/font_color = Color(0.878, 0.878, 0.973, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
@@ -163,6 +163,6 @@ offset_top = -26.0
 offset_right = 200.0
 offset_bottom = -6.0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 0.7)
+theme_override_colors/font_color = Color(0.502, 0.502, 0.596, 0.7)
 theme_override_font_sizes/font_size = 13
 text = "v0.1 — Early Development"

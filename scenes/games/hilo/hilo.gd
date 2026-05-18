@@ -203,7 +203,7 @@ func _apply_state(new_state: State) -> void:
 	skip_btn.disabled   = not active
 	if active:
 		bet_btn.text     = "CASH OUT  $%s" % _fmt(current_bet * multiplier)
-		bet_btn.modulate = Color(1.0, 0.85, 0.2, 1)
+		bet_btn.modulate = Color(0.973, 0.816, 0.188, 1)
 	else:
 		bet_btn.text     = "BET"
 		bet_btn.modulate = Color(1.0, 1.0, 1.0, 1)

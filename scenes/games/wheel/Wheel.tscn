@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://dgb53iblx6v41"]
 
 [ext_resource type="Script" uid="uid://37x442eh4ach" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
-[ext_resource type="Texture2D" uid="uid://bib8xnt7qgii3" path="res://Assets/Wheel/Wheel.png" id="2_wheel_tex"]
+[ext_resource type="Texture2D" uid="uid://c6e4jet5hcmqd" path="res://Assets/Wheel/Wheel2.png" id="2_wheel_tex"]
 [ext_resource type="Texture2D" uid="uid://s8hend84txmy" path="res://Assets/Wheel/SpinBtn.png" id="3_spinbtn_tex"]
 [ext_resource type="Script" path="res://scenes/games/wheel/wheel_overlay.gd" id="4_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.31, 0.239, 0.565, 1)
+bg_color = Color(0.659, 0.220, 0.220, 1)
 
 [node name="Wheel" type="Control" unique_id=1812124858]
 layout_mode = 3
@@ -24,7 +24,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.039, 0.027, 0.094, 1)
+color = Color(0.157, 0.031, 0.031, 1)
 
 [node name="Center" type="CenterContainer" parent="." unique_id=781224320]
 layout_mode = 1
@@ -41,7 +41,7 @@ theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Center/GameArea" unique_id=486428242]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.878, 0.2, 1)
+theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
 theme_override_font_sizes/font_size = 26
 text = "★  WHEEL  ★"
 horizontal_alignment = 1
@@ -58,14 +58,14 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_colors/font_color = Color(0.376, 0.973, 0.502, 1)
 theme_override_font_sizes/font_size = 20
 text = "Balance:  $1,000"
 
 [node name="FameLabel" type="Label" parent="Center/GameArea/TopBar" unique_id=1826595186]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.78, 1, 1)
+theme_override_colors/font_color = Color(0.502, 0.753, 0.973, 1)
 theme_override_font_sizes/font_size = 20
 text = "0 / 25,000 Fame"
 horizontal_alignment = 2
@@ -127,7 +127,7 @@ script = ExtResource("4_overlay")
 [node name="ResultLabel" type="Label" parent="Center/GameArea" unique_id=133000885]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 0.45, 1)
+theme_override_colors/font_color = Color(0.973, 0.973, 0.439, 1)
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
@@ -137,7 +137,7 @@ theme_override_constants/separation = 10
 
 [node name="BetLabel" type="Label" parent="Center/GameArea/BetRow" unique_id=109558668]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.65, 0.78, 1)
+theme_override_colors/font_color = Color(0.627, 0.627, 0.753, 1)
 theme_override_font_sizes/font_size = 20
 text = "Bet:  $"
 vertical_alignment = 1
