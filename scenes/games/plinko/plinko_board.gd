@@ -7,8 +7,8 @@ const TOP_Y      : float = 40.0
 const ROW_H      : float = 30.0
 const BUCKET_TOP : float = 400.0
 const BUCKET_H   : float = 50.0
-const PEG_R      : float = 4.0
-const BALL_R     : float = 8.0
+const PEG_R      : float = 6.0
+const BALL_R     : float = 10.0
 
 const MULTS : Array[float] = [
 	500.0, 25.0, 7.0, 2.0, 0.5, 0.2, 0.1,
@@ -32,8 +32,9 @@ const BUCKET_COLORS : Array[Color] = [
 	Color(0.973, 0.847, 0.188, 1.0),  # 500x — full gold
 ]
 
-const COL_PEG  := Color(0.816, 0.816, 0.816, 1.0)
-const COL_BALL := Color(0.973, 0.847, 0.188, 1.0)
+const PEG_TEX  = preload("res://Assets/Plinko/Asset 1 peg.png")
+const BALL_TEX = preload("res://Assets/Plinko/Asset 2 ball.png")
+
 const COL_EDGE := Color(0.000, 0.000, 0.000, 0.600)
 const COL_LBL  := Color(0.973, 0.973, 0.973, 1.0)
 
@@ -56,9 +57,11 @@ func remove_ball(id: int) -> void:
 func _draw() -> void:
 	var ps := _ps()
 	# Pegs — row r has (r+1) pegs, centred horizontally
+	var pd := PEG_R * 2.0
 	for row in range(ROWS):
 		for col in range(row + 1):
-			draw_circle(peg_pos(row, col), PEG_R, COL_PEG)
+			var pp := peg_pos(row, col)
+			draw_texture_rect(PEG_TEX, Rect2(pp - Vector2(PEG_R, PEG_R), Vector2(pd, pd)), false)
 	# Buckets
 	var font := ThemeDB.fallback_font
 	for i in range(BUCKETS):
@@ -73,8 +76,9 @@ func _draw() -> void:
 				_fmt_mult(MULTS[i]),
 				HORIZONTAL_ALIGNMENT_CENTER, ps, 10, COL_LBL)
 	# All active balls
+	var bd := BALL_R * 2.0
 	for pos in balls.values():
-		draw_circle(pos, BALL_R, COL_BALL)
+		draw_texture_rect(BALL_TEX, Rect2(pos - Vector2(BALL_R, BALL_R), Vector2(bd, bd)), false)
 
 
 func peg_pos(row: int, col: int) -> Vector2:
