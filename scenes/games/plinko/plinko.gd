@@ -13,8 +13,10 @@ const MULTS : Array[float] = [
 # Binomial weights C(12, k) — sum = 4096 = 2^12
 const WEIGHTS : Array[int] = [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 12, 1]
 
-enum State { IDLE, DROPPING }
-var state : State = State.IDLE
+# Tracks the in-flight animation so a new DROP can kill it and settle instantly.
+var _active_tween   : Tween = null
+var _pending_bucket : int   = -1
+var _pending_bet    : float = 0.0
 
 @onready var board       : PlinkoBoard = %Board
 @onready var balance_lbl : Label       = %BalanceLabel
@@ -33,8 +35,11 @@ func _ready() -> void:
 
 
 func _on_drop() -> void:
-	if state != State.IDLE:
-		return
+	# If a ball is mid-air, kill the tween and settle that bet instantly.
+	if _active_tween != null:
+		_active_tween.kill()
+		_active_tween = null
+		_on_drop_complete(_pending_bucket, _pending_bet)
 	var bet := bet_input.text.to_float()
 	if bet < MIN_BET:
 		result_lbl.text = "Minimum bet: $%s" % _fmt(MIN_BET)
@@ -48,11 +53,11 @@ func _on_drop() -> void:
 	result_lbl.remove_theme_color_override("font_color")
 	var bucket := _weighted_bucket()
 	var path   := _build_path(bucket)
-	state             = State.DROPPING
-	drop_btn.disabled = true
-	board.lit_bucket  = -1
-	board.ball_pos    = path[0]
-	_animate(path, bucket, bet)
+	_pending_bucket  = bucket
+	_pending_bet     = bet
+	board.lit_bucket = -1
+	board.ball_pos   = path[0]
+	_active_tween    = _animate(path, bucket, bet)
 
 
 # Weighted random bucket index matching binomial(12, 0.5) distribution.
@@ -86,14 +91,16 @@ func _build_path(bucket: int) -> Array[Vector2]:
 	return path
 
 
-func _animate(path: Array[Vector2], bucket: int, bet: float) -> void:
+func _animate(path: Array[Vector2], bucket: int, bet: float) -> Tween:
 	var tw := create_tween()
 	for i in range(1, path.size()):
 		tw.tween_property(board, "ball_pos", path[i], STEP_TIME)
 	tw.tween_callback(_on_drop_complete.bind(bucket, bet))
+	return tw
 
 
 func _on_drop_complete(bucket: int, bet: float) -> void:
+	_active_tween = null
 	var mult   := MULTS[bucket]
 	var payout := bet * mult
 	var net    := payout - bet
@@ -110,9 +117,6 @@ func _on_drop_complete(bucket: int, bet: float) -> void:
 	else:
 		result_lbl.add_theme_color_override("font_color", Color(0.973, 0.376, 0.376, 1))
 		result_lbl.text = "%s  -$%s" % [mult_str, _fmt(-net)]
-
-	state             = State.IDLE
-	drop_btn.disabled = false
 
 
 func _update_hud() -> void:
