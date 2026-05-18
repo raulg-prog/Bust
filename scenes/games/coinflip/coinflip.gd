@@ -44,6 +44,7 @@ func _ready() -> void:
 	heads_btn.pressed.connect(func(): _select(0))
 	tails_btn.pressed.connect(func(): _select(1))
 	flip_btn.pressed.connect(_on_flip)
+	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/Towns/Town1.tscn"))
 	cashout_btn.pressed.connect(_on_cashout)
 
 	_apply_state(State.IDLE)

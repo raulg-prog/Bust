@@ -81,11 +81,18 @@ Bust/
 │   │   └── minicards.png           # History strip cards (433×160px)
 │   ├── Fonts/
 │   │   └── m5x7.ttf                # Pixel font (kept in assets, NOT used in theme)
+│   ├── Buildings/
+│   │   ├── HiLo.png                # 256×192 log cabin — Town 1 HiLo hall
+│   │   └── CoinFlip.png            # 256×192 log cabin — Town 1 CoinFlip hall
 │   ├── Wheel/
 │   │   ├── Wheel.png               # Old wheel image — kept but not used
 │   │   ├── Wheel2.png              # Active wheel image — 20 segments, centres at 12 o'clock multiples
 │   │   └── SpinBtn.png             # Spin button image (green SPIN circle)
-│   └── Floor TIles/                # Tileset assets (not yet wired up)
+│   ├── Floor TIles/                # Tileset assets (16×16 native)
+│   │   └── 1x/                     # Custom 64×64 grass tiles (Artboard 1grass1-4.png)
+│   ├── Artboard 1tilemapgrass.png  # 128×128 grass tileset — 2×2 atlas of 4 variants at 64×64
+│   └── vector-rpg-character-template/  # Player character sprites (64px frames)
+│       └── Individual Animations/  # idle-1/2_64.png, walk-1/2_64.png + directional SVGs
 ├── autoloads/
 │   └── game_state.gd               # Global singleton
 ├── scenes/
@@ -93,6 +100,12 @@ Bust/
 │   │   ├── MainMenu.tscn           # Main menu — set as project main scene
 │   │   ├── main_menu.gd            # UI logic (New Game → HiLo, Quit)
 │   │   └── main_menu_bg.gd         # Procedural scrolling Leaf Green-style tilemap
+│   ├── player/
+│   │   ├── Player.tscn             # Reusable player scene (CharacterBody2D)
+│   │   └── player.gd               # 4-directional movement + directional animations
+│   ├── Towns/
+│   │   ├── Town1.tscn              # Welcoming — 20×18 tile map, 2 game buildings
+│   │   └── town1.gd                # @tool: procedural grass fill + door triggers
 │   └── games/
 │       ├── hilo/
 │       │   ├── HiLo.tscn
@@ -363,18 +376,19 @@ MainMenu (Control, main_menu.gd)
 
 ## What's Not Built Yet
 
-- Overworld / town scenes
+- Towns 2–5 scenes
 - Town 2–5 remaining games (Roulette, Dice, Mines, Tower, Slots)
-- Scene navigation / BackButton wiring for HiLo, CoinFlip, Wheel (Plinko has it wired)
+- BackButton wiring for Wheel (HiLo and CoinFlip now return to Town1)
 - Multiplayer card rooms
 - Wheel of Fortune UI (safety-net free spin — separate from the Wheel betting game)
 - Save/load system
 - OST and sound effects
 - NPC sidequests
+- Town1 decoration (paths, trees, fences between buildings)
 
 ---
 
-## Session Notes — Last worked on: 2026-05-17
+## Session Notes — Last worked on: 2026-05-18
 
 ### Wheel game — fully playable, all bugs resolved
 
@@ -422,6 +436,17 @@ MainMenu (Control, main_menu.gd)
 - Trees switched to `Tree_Pine_2_16x16` (32×32) to avoid crown cutoff at screen edges
 - All tile colours matched to Pokémon FireRed/LeafGreen Four Island reference
 
+### Town1 + Player — first overworld scene built
+
+- `scenes/player/Player.tscn` — reusable `CharacterBody2D`: `AnimatedSprite2D` (4-directional idle/walk from SVG atlas), `CircleShape2D` collision, `Camera2D` (zoom=2, position smoothing)
+- `player.gd` — dominant-axis 4-directional movement at 200px/s; tracks `_facing` enum for correct idle animation on stop; `idle left` mirrors `idle right` with `flip_h`
+- `scenes/Towns/Town1.tscn` — 20×18 tile map (1280×1152px), `TileMapLayer` with 64×64 grass atlas (4 variants), 2 game buildings, player spawns at (640, 576)
+- `town1.gd` — `@tool` script: fixed-seed fill in editor (stable view), randomized at runtime; camera limits clamped to map bounds; door triggers use `call_deferred` to avoid physics callback errors
+- `HiLoBuilding` + `CoinFlipBuilding` — `StaticBody2D` each with `Sprite2D`, body collision, and `Area2D` door trigger → `call_deferred("change_scene_to_file", ...)`
+- Buildings: `Assets/Buildings/HiLo.png` + `CoinFlip.png` — both 256×192px (4×3 tiles), log cabin style
+- BackButton in HiLo and CoinFlip now returns to `Town1.tscn` (was MainMenu)
+
 ### Next up
-- Wire BackButton in HiLo, CoinFlip, Wheel (copy pattern from Plinko)
-- Eventually: overworld map scene to replace the direct HiLo temp load in `main_menu.gd`
+- Wire BackButton in Wheel (copy pattern from HiLo/CoinFlip → Town1... or Town2 when built)
+- Town1 decoration: paint paths and trees on a Decor TileMapLayer between/around buildings
+- Eventually: replace direct HiLo temp load in `main_menu.gd` with Town1

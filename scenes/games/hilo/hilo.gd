@@ -56,6 +56,7 @@ func _ready() -> void:
 	lower_btn.pressed.connect(func(): _guess(-1))
 	skip_btn.pressed.connect(_on_skip)
 	bet_btn.pressed.connect(_on_bet_btn)
+	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/Towns/Town1.tscn"))
 	_apply_state(State.IDLE)
 	card_sprite.texture = _back_tex()
 	_update_hud()
