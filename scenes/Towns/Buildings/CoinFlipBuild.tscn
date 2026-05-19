@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://t3bcba5dcb6c"]
+
+[ext_resource type="Texture2D" uid="uid://wna4wc0ljyfo" path="res://Assets/Buildings/CoinFlip.png" id="1_x01x1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f5kit"]
+size = Vector2(15, 11)
+
+[node name="CoinFlipBuild" type="Node2D" unique_id=1326361399]
+
+[node name="CoinFlipBuilding" type="StaticBody2D" parent="." unique_id=1221045052]
+
+[node name="Sprite2D" type="Sprite2D" parent="CoinFlipBuilding" unique_id=795305583]
+texture = ExtResource("1_x01x1")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CoinFlipBuilding/Sprite2D" unique_id=650977252]
+polygon = PackedVector2Array(-5, -78, 0, -78, 30, -50, 83, -50, 83, -75, 88, -75, 93, -78, 97, -78, 100, -75, 106, -75, 107, -50, 123, -50, 126, 6, 124, 11, 118, 11, 118, 31, -120, 28, -120, 10, -126, 7, -122, -52, -34, -51)
+
+[node name="Door" type="Area2D" parent="CoinFlipBuilding" unique_id=2062144504]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CoinFlipBuilding/Door" unique_id=2126815872]
+position = Vector2(-3, 41)
+shape = SubResource("RectangleShape2D_f5kit")

@@ -3,8 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://d25kveblwus77" path="res://Assets/Artboard 1tilemapgrass.png" id="1_grass"]
 [ext_resource type="Script" uid="uid://cvfpt1n2yh8ka" path="res://scenes/Towns/town1.gd" id="2_town1"]
 [ext_resource type="PackedScene" uid="uid://dp4n5sjkwnahc" path="res://scenes/player/Player.tscn" id="3_player"]
-[ext_resource type="Texture2D" uid="uid://wvyu0u73dxge" path="res://Assets/Buildings/HiLo.png" id="4_hilo_tex"]
-[ext_resource type="Texture2D" uid="uid://wna4wc0ljyfo" path="res://Assets/Buildings/CoinFlip.png" id="5_coinflip_tex"]
+[ext_resource type="PackedScene" uid="uid://877wbm20jbt5" path="res://scenes/Towns/Buildings/HiLoBuild.tscn" id="4_hilobuild"]
+[ext_resource type="PackedScene" uid="uid://t3bcba5dcb6c" path="res://scenes/Towns/Buildings/CoinFlipBuild.tscn" id="5_coinflipbuild"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
 texture = ExtResource("1_grass")
@@ -18,17 +18,6 @@ texture_region_size = Vector2i(64, 64)
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_1")
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hilo_body"]
-size = Vector2(242, 113)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hilo_door"]
-size = Vector2(15, 13)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_coinflip_body"]
-size = Vector2(242, 112)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_coinflip_door"]
-size = Vector2(17, 13)
 
 [node name="Town1" type="Node2D" unique_id=252272196]
 script = ExtResource("2_town1")
@@ -40,41 +29,11 @@ tile_set = SubResource("TileSet_1")
 
 [node name="Buildings" type="Node2D" parent="." unique_id=2014409449]
 
-[node name="HiLoBuilding" type="StaticBody2D" parent="Buildings" unique_id=2064390255]
+[node name="HiLoBuild" parent="Buildings" instance=ExtResource("4_hilobuild")]
 position = Vector2(640, 224)
 
-[node name="Sprite2D" type="Sprite2D" parent="Buildings/HiLoBuilding" unique_id=2004890635]
-texture_filter = 1
-texture = ExtResource("4_hilo_tex")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/HiLoBuilding" unique_id=27342737]
-position = Vector2(-3, -4)
-shape = SubResource("RectangleShape2D_hilo_body")
-
-[node name="Door" type="Area2D" parent="Buildings/HiLoBuilding" unique_id=1212260155]
-position = Vector2(0, 88)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/HiLoBuilding/Door" unique_id=1422876743]
-position = Vector2(-4, -33)
-shape = SubResource("RectangleShape2D_hilo_door")
-
-[node name="CoinFlipBuilding" type="StaticBody2D" parent="Buildings" unique_id=976322136]
+[node name="CoinFlipBuild" parent="Buildings" instance=ExtResource("5_coinflipbuild")]
 position = Vector2(1024, 224)
-
-[node name="Sprite2D" type="Sprite2D" parent="Buildings/CoinFlipBuilding" unique_id=838843385]
-texture_filter = 1
-texture = ExtResource("5_coinflip_tex")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/CoinFlipBuilding" unique_id=767464517]
-position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_coinflip_body")
-
-[node name="Door" type="Area2D" parent="Buildings/CoinFlipBuilding" unique_id=2087352358]
-position = Vector2(0, 88)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/CoinFlipBuilding/Door" unique_id=822608492]
-position = Vector2(-3, -34)
-shape = SubResource("RectangleShape2D_coinflip_door")
 
 [node name="Player" parent="." unique_id=332735309 instance=ExtResource("3_player")]
 position = Vector2(639, 579)

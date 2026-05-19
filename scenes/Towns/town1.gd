@@ -14,8 +14,8 @@ func _ready() -> void:
 	_fill_grass()
 	if not Engine.is_editor_hint():
 		_setup_camera()
-		$Buildings/HiLoBuilding/Door.body_entered.connect(_on_hilo_door_entered)
-		$Buildings/CoinFlipBuilding/Door.body_entered.connect(_on_coinflip_door_entered)
+		$Buildings/HiLoBuild/HiLoBuilding/Door.body_entered.connect(_on_hilo_door_entered)
+		$Buildings/CoinFlipBuild/CoinFlipBuilding/Door.body_entered.connect(_on_coinflip_door_entered)
 
 
 func _fill_grass() -> void:

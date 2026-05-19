@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://877wbm20jbt5"]
+
+[ext_resource type="Texture2D" uid="uid://wvyu0u73dxge" path="res://Assets/Buildings/HiLo.png" id="1_syphe"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_somnf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ag7kt"]
+size = Vector2(15, 14)
+
+[node name="HiLoBuild" type="Node2D" unique_id=1132206200]
+
+[node name="HiLoBuilding" type="StaticBody2D" parent="." unique_id=1671964775]
+physics_material_override = SubResource("PhysicsMaterial_somnf")
+
+[node name="Sprite2D" type="Sprite2D" parent="HiLoBuilding" unique_id=1918412199]
+texture = ExtResource("1_syphe")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="HiLoBuilding/Sprite2D" unique_id=2063294566]
+polygon = PackedVector2Array(-5, -78, 0, -78, 29, -51, 82, -50, 83, -75, 89, -76, 93, -78, 97, -78, 100, -75, 106, -75, 107, -51, 123, -51, 123, -28, 125, -25, 125, -12, 126, -10, 126, -1, 126, 7, 124, 12, 119, 12, 118, 34, -120, 33, -120, 12, -126, 8, -123, -51, -34, -51)
+
+[node name="Door" type="Area2D" parent="HiLoBuilding" unique_id=1606001284]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HiLoBuilding/Door" unique_id=869149172]
+position = Vector2(-3.5, 41)
+shape = SubResource("RectangleShape2D_ag7kt")
