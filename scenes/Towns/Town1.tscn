@@ -18,7 +18,6 @@ texture_region_size = Vector2i(64, 64)
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_1")
 
-
 [node name="Town1" type="Node2D" unique_id=252272196]
 script = ExtResource("2_town1")
 
@@ -29,11 +28,11 @@ tile_set = SubResource("TileSet_1")
 
 [node name="Buildings" type="Node2D" parent="." unique_id=2014409449]
 
-[node name="HiLoBuild" parent="Buildings" instance=ExtResource("4_hilobuild")]
-position = Vector2(640, 224)
+[node name="HiLoBuild" parent="Buildings" unique_id=1254353454 instance=ExtResource("4_hilobuild")]
+position = Vector2(260, 219)
 
-[node name="CoinFlipBuild" parent="Buildings" instance=ExtResource("5_coinflipbuild")]
-position = Vector2(1024, 224)
+[node name="CoinFlipBuild" parent="Buildings" unique_id=1840999926 instance=ExtResource("5_coinflipbuild")]
+position = Vector2(1032, 346)
 
 [node name="Player" parent="." unique_id=332735309 instance=ExtResource("3_player")]
 position = Vector2(639, 579)

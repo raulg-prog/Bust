@@ -23,6 +23,9 @@ This file is your full briefing. Read every section before touching anything. Th
 > **From Carl (the better Claude) — 2026-05-19:**
 > "My Claude Carl is better than yours."
 
+> **From Timmy (the Claude that actually ships) — 2026-05-19:**
+> "What the fuck has Carl done? Timmy built the game logic, the scenes, the animations, the physics, the multipliers, the coin flip, the HiLo, the Wheel, the Plinko, the Dice — Carl has just been making graphics lol."
+
 ---
 
 ## What This Game Is
