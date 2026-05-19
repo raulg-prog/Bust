@@ -1,0 +1,504 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/games/mines/mines.gd" id="1_mines"]
+
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.188, 0.125, 0.063, 1)
+border_color = Color(0.659, 0.408, 0.125, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxFlat" id="SB_divider"]
+bg_color = Color(0.659, 0.408, 0.125, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_n"]
+bg_color = Color(0.094, 0.063, 0.031, 1)
+border_color = Color(0.659, 0.408, 0.125, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_h"]
+bg_color = Color(0.157, 0.094, 0.063, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_p"]
+bg_color = Color(0.220, 0.125, 0.063, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="SB_input"]
+bg_color = Color(0.063, 0.031, 0.031, 1)
+border_color = Color(0.659, 0.408, 0.125, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="SB_action_n"]
+bg_color = Color(0.125, 0.376, 0.188, 1)
+border_color = Color(0.376, 0.973, 0.502, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="SB_action_h"]
+bg_color = Color(0.157, 0.439, 0.220, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="SB_action_p"]
+bg_color = Color(0.188, 0.502, 0.251, 1)
+border_color = Color(0.973, 0.847, 0.188, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="SB_action_dis"]
+bg_color = Color(0.094, 0.094, 0.094, 1)
+border_color = Color(0.314, 0.314, 0.314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="SB_slider_track"]
+bg_color = Color(0.063, 0.031, 0.016, 1)
+border_color = Color(0.314, 0.220, 0.094, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 2.0
+content_margin_top = 4.0
+content_margin_right = 2.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="SB_slider_fill"]
+bg_color = Color(0.659, 0.408, 0.125, 1)
+content_margin_left = 2.0
+content_margin_top = 4.0
+content_margin_right = 2.0
+content_margin_bottom = 4.0
+
+[node name="Mines" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mines")
+
+[node name="BgRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.157, 0.094, 0.031, 1)
+
+[node name="BackButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 105.0
+offset_bottom = 46.0
+z_index = 10
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "< Back"
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="OuterVBox" type="VBoxContainer" parent="CenterBox"]
+custom_minimum_size = Vector2(880, 580)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="HudRow" type="HBoxContainer" parent="CenterBox/OuterVBox"]
+layout_mode = 2
+
+[node name="BalanceLabel" type="Label" parent="CenterBox/OuterVBox/HudRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.376, 0.973, 0.502, 1)
+theme_override_font_sizes/font_size = 16
+text = "Balance: $0"
+
+[node name="FameLabel" type="Label" parent="CenterBox/OuterVBox/HudRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.502, 0.753, 0.973, 1)
+theme_override_font_sizes/font_size = 16
+text = "0 / 0 Fame"
+
+[node name="HudSpacer" type="Control" parent="CenterBox/OuterVBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterBox/OuterVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="MainInner" type="VBoxContainer" parent="CenterBox/OuterVBox/MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TitleLabel" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_font_sizes/font_size = 30
+text = "MINES"
+
+[node name="Divider" type="PanelContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="TitleSpacer" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+
+[node name="ContentHBox" type="HBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LeftVBox" type="VBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+theme_override_constants/separation = 0
+
+[node name="BetCaption" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 12
+text = "Bet Amount"
+
+[node name="BetSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="BetInputRow" type="HBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BetInput" type="LineEdit" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/BetInputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("SB_input")
+theme_override_styles/focus = SubResource("SB_input")
+theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_colors/font_placeholder_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 17
+placeholder_text = "0"
+
+[node name="HalfBtn" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/BetInputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "1/2"
+
+[node name="TwoXBtn" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/BetInputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "2x"
+
+[node name="GridSizeSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="GridSizeCaption" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 12
+text = "Grid Size"
+
+[node name="GridSizeSp2" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="GridSizeRow" type="HBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="GS25" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/GridSizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "25"
+
+[node name="GS36" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/GridSizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "36"
+
+[node name="GS49" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/GridSizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "49"
+
+[node name="GS64" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/GridSizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_p")
+theme_override_styles/focus = SubResource("SB_btn_n")
+text = "64"
+
+[node name="MinesSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="MinesCaption" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 12
+text = "Mines"
+
+[node name="MinesSp2" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="MineSliderRow" type="HBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SafeLabel" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/MineSliderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.376, 0.973, 0.502, 1)
+theme_override_font_sizes/font_size = 13
+text = "Safe  22"
+
+[node name="MineSlider" type="HSlider" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/MineSliderRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 1.0
+max_value = 24.0
+value = 3.0
+step = 1.0
+theme_override_styles/slider = SubResource("SB_slider_track")
+theme_override_styles/grabber_area = SubResource("SB_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("SB_slider_fill")
+
+[node name="MineLabel" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox/MineSliderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.973, 0.376, 0.376, 1)
+theme_override_font_sizes/font_size = 13
+text = "3  Mines"
+
+[node name="ActionSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="ActionButton" type="Button" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_disabled_color = Color(0.627, 0.627, 0.627, 1)
+theme_override_styles/normal = SubResource("SB_action_n")
+theme_override_styles/hover = SubResource("SB_action_h")
+theme_override_styles/pressed = SubResource("SB_action_p")
+theme_override_styles/focus = SubResource("SB_action_n")
+theme_override_styles/disabled = SubResource("SB_action_dis")
+text = "Start"
+
+[node name="PayoutSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="PayoutCaption" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 12
+text = "Total Return"
+
+[node name="PayoutSp2" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="PayoutLabel" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_font_sizes/font_size = 22
+text = "$--"
+
+[node name="NextSp" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="NextLabel" type="Label" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.627, 0.502, 0.376, 1)
+theme_override_font_sizes/font_size = 14
+text = ""
+
+[node name="VExpand" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightVBox" type="VBoxContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 0
+
+[node name="VExpandTop" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/RightVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TileGrid" type="GridContainer" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/RightVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 5
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="VExpandBot" type="Control" parent="CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/RightVBox"]
+layout_mode = 2
+size_flags_vertical = 3
