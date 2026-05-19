@@ -12,7 +12,7 @@ size = Vector2(15, 11)
 [node name="Sprite2D" type="Sprite2D" parent="CoinFlipBuilding" unique_id=795305583]
 texture = ExtResource("1_x01x1")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CoinFlipBuilding/Sprite2D" unique_id=650977252]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="CoinFlipBuilding" unique_id=650977252]
 polygon = PackedVector2Array(-5, -78, 0, -78, 30, -50, 83, -50, 83, -75, 88, -75, 93, -78, 97, -78, 100, -75, 106, -75, 107, -50, 123, -50, 126, 6, 124, 11, 118, 11, 118, 31, -120, 28, -120, 10, -126, 7, -122, -52, -34, -51)
 
 [node name="Door" type="Area2D" parent="CoinFlipBuilding" unique_id=2062144504]
