@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-const SPEED : float = 200.0
+const SPEED : float = 120.0
 
 enum Dir { DOWN, UP, LEFT, RIGHT }
 

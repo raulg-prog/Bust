@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://37x442eh4ach" path="res://scenes/games/wheel/wheel.gd" id="1_wheel"]
 [ext_resource type="Texture2D" uid="uid://c6e4jet5hcmqd" path="res://Assets/Wheel/Wheel2.png" id="2_wheel_tex"]
 [ext_resource type="Texture2D" uid="uid://s8hend84txmy" path="res://Assets/Wheel/SpinBtn.png" id="3_spinbtn_tex"]
-[ext_resource type="Script" path="res://scenes/games/wheel/wheel_overlay.gd" id="4_overlay"]
+[ext_resource type="Script" uid="uid://clpxet71qo35i" path="res://scenes/games/wheel/wheel_overlay.gd" id="4_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.659, 0.220, 0.220, 1)
+bg_color = Color(0.659, 0.22, 0.22, 1)
 
 [node name="Wheel" type="Control" unique_id=1812124858]
 layout_mode = 3
@@ -31,6 +31,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -14.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -112,9 +114,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="WheelOverlay" type="Control" parent="Center/GameArea/WheelContainer"]
+[node name="WheelOverlay" type="Control" parent="Center/GameArea/WheelContainer" unique_id=679733487]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

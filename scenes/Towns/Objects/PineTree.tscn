@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cxl3x6yjw4fr8"]
+
+[ext_resource type="Texture2D" uid="uid://oioomdhuuik5" path="res://Assets/Floor TIles/Artboard 1tree.png" id="1_v0dyt"]
+
+[node name="PineTree" type="Node2D" unique_id=1367895147]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1661690547]
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D" unique_id=1181550662]
+position = Vector2(8, -8)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("1_v0dyt")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D" unique_id=1432205316]
+position = Vector2(8, -8)
+scale = Vector2(1.4375, 1.4375)
+polygon = PackedVector2Array(0, -16, 8, -8, 8, 8, 0, 8, 0, 16, -8, 8, -8, 0, -8, -8)

@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b1nxqidjjtmnv"]
+
+[ext_resource type="Texture2D" uid="uid://8i7278aww5o1" path="res://Assets/Floor TIles/Artboard 1bush.png" id="1_tunca"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_705li"]
+size = Vector2(14, 9)
+
+[node name="Bush" type="Node2D" unique_id=543220675]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=753075375]
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D" unique_id=1771748189]
+position = Vector2(6.5, -4.5)
+scale = Vector2(1.40625, 1.28125)
+texture = ExtResource("1_tunca")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=924172456]
+position = Vector2(6, 1.5)
+shape = SubResource("RectangleShape2D_705li")

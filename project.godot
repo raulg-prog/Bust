@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Bust"
-run/main_scene="res://scenes/games/hilo/HiLo.tscn"
+run/main_scene="res://scenes/main_menu/MainMenu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="uid://d0fkw4a3f1nj2"
 
@@ -34,6 +34,5 @@ theme/custom="res://default_theme.tres"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
-anti_aliasing/quality/msaa_2d=3
-anti_aliasing/quality/msaa_3d=3
