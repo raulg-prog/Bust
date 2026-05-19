@@ -522,7 +522,15 @@ MainMenu (Control, main_menu.gd)
 - BackButton → MainMenu (temporary until Town3 scene is built)
 - `var rx : float` explicit annotation in `dice_slider.gd` — required to fix GDScript type-inference parser error
 
+### Navigation wired — all back buttons + New Game entry point
+
+- Wheel `BackButton` → `Town1.tscn` (`unique_name_in_owner = true` added, `< Back` text, wired in `wheel.gd`)
+- Plinko `BackButton` → `Town1.tscn` (was MainMenu)
+- `main_menu.gd` New Game now loads `Town1.tscn` directly (was HiLo temp load)
+- All five game scenes (HiLo, CoinFlip, Wheel, Plinko, Dice) now return somewhere sensible on back
+
 ### Next up
-- Wire BackButton in Wheel (copy pattern from HiLo/CoinFlip → Town1... or Town2 when built)
 - Town1 decoration: paint paths and trees on a Decor TileMapLayer between/around buildings
-- Eventually: replace direct HiLo temp load in `main_menu.gd` with Town1
+- Build Town2 scene (Cascade — Wheel + Plinko, red room theme); wire Wheel/Plinko BackButtons to it
+- Build Town3 scene (The Odds — Roulette + Dice); wire Dice BackButton to it
+- Wire New Game in main_menu to Town1 ✅ (done)

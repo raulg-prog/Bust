@@ -10,8 +10,7 @@ func _ready() -> void:
 
 
 func _on_new_game() -> void:
-	# Temporary: loads HiLo until the overworld is built
-	get_tree().change_scene_to_file("res://scenes/games/hilo/HiLo.tscn")
+	get_tree().change_scene_to_file("res://scenes/Towns/Town1.tscn")
 
 
 func _on_quit() -> void:
