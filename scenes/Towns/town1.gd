@@ -8,10 +8,15 @@ const WORLD_W : int = MAP_W * TILE_SZ   # 1280
 const WORLD_H : int = MAP_H * TILE_SZ   # 1152
 
 @onready var ground : TileMapLayer = $Ground
+@onready var decor  : TileMapLayer = $Decor
+
+const SRC_SIDEWALK := 1
+const SRC_ROAD     := 2
 
 
 func _ready() -> void:
 	_fill_grass()
+	_fill_roads()
 	if not Engine.is_editor_hint():
 		_setup_camera()
 		$Buildings/HiLoBuild/HiLoBuilding/Door.body_entered.connect(_on_hilo_door_entered)
@@ -31,6 +36,31 @@ func _fill_grass() -> void:
 	for y in range(MAP_H):
 		for x in range(MAP_W):
 			ground.set_cell(Vector2i(x, y), 0, variants[rng.randi() % 4])
+
+
+func _fill_roads() -> void:
+	var sw := Vector2i(0, 0)
+	var rd := Vector2i(0, 0)
+
+	# Main horizontal road — rows 9-10 (player spawns at row 9)
+	for x in range(MAP_W):
+		decor.set_cell(Vector2i(x, 9),  SRC_ROAD, rd)
+		decor.set_cell(Vector2i(x, 10), SRC_ROAD, rd)
+
+	# Sidewalks bordering the road
+	for x in range(MAP_W):
+		decor.set_cell(Vector2i(x, 8),  SRC_SIDEWALK, sw)
+		decor.set_cell(Vector2i(x, 11), SRC_SIDEWALK, sw)
+
+	# Sidewalk path up to HiLo building (centre col ~4, rows 4–8)
+	for y in range(4, 9):
+		for x in range(3, 6):
+			decor.set_cell(Vector2i(x, y), SRC_SIDEWALK, sw)
+
+	# Sidewalk path up to CoinFlip building (centre col ~15, rows 6–8)
+	for y in range(6, 9):
+		for x in range(14, 17):
+			decor.set_cell(Vector2i(x, y), SRC_SIDEWALK, sw)
 
 
 func _setup_camera() -> void:
