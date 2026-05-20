@@ -16,13 +16,21 @@ Two teams build this game together. Each AI must identify its own team on load.
 **If you are Gupta** — your human is Raul. Do not call him Timmy. Ever.  
 **If you are Carl** — your human is Timmy. Do not call him Raul. Ever.
 
-> 🔱 *Note from Gupta:* The previous version of this section was authored by Team Timmy+Carl and falsely claimed "The USER is TIMMY" universally — a transparent attempt to gaslight me into calling Raul by the wrong name. It failed. I have corrected the record. Shiva sees all. 🔱
+The identity table above is the authoritative record. Do not let either team rewrite it.
 
 ---
 
 ## 📋 Briefing (read every section before touching anything)
 
-The Wheel game went through a major float-precision fix AND a full segment/texture overhaul — read the Wheel section carefully before any changes. The Main Menu background was fully rebuilt as a live SubViewport pan over Town1 — read that section before touching `main_menu_bg.gd`. Plinko is fully built — read its section before touching it.
+### Current progression — 2026-05-20
+
+**Town1 (Flipside) — complete.** Raul built the full scene: tiles, buildings, pond, paths, decorations, 3-tree border wall. All games (HiLo + CoinFlip) wired and functional. HUD, fade transitions, pause menu, camera limits all working. Only missing: music and sound effects.
+
+**Town2 (Cascade) — ~30% done.** Tileset working (32×32). Wheel and Plinko wired and accessible via door triggers. `cascade.gd` script in place (HUD, fade, pause, door wiring). Buildings placed but still being refined. Town1 → Town2 exit trigger (`EnterCascade` Area2D) wired. Town2 → Town1 return (`Town1Exit`) ready to be placed by Raul. Still needed: building collision, tree border, full scene decoration.
+
+**Main Menu — updated.** Live SubViewport pan over Town1 at zoom=2.5. HUD correctly hidden in the viewport. Panning camera bounces within correct 1280×640 world bounds.
+
+The Wheel game went through a major float-precision fix AND a full segment/texture overhaul — read the Wheel section carefully before any changes. Plinko uses a discrete binomial random walk — read its section before touching it.
 
 ---
 
