@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/games/roulette/roulette.gd" id="1_roulette"]
 [ext_resource type="Script" path="res://scenes/games/roulette/roulette_wheel.gd" id="2_wheel"]
+[ext_resource type="Script" path="res://scenes/games/roulette/chip_overlay.gd" id="3_chip"]
 
 [sub_resource type="StyleBoxFlat" id="SB_panel"]
 bg_color = Color(0.031, 0.094, 0.047, 1)
@@ -164,7 +165,7 @@ anchor_bottom = 1.0
 mouse_filter = 2
 
 [node name="OuterVBox" type="VBoxContainer" parent="BoardView/CenterBox"]
-custom_minimum_size = Vector2(960, 580)
+custom_minimum_size = Vector2(980, 640)
 layout_mode = 2
 theme_override_constants/separation = 0
 
@@ -217,52 +218,90 @@ theme_override_styles/panel = SubResource("SB_divider")
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
-[node name="ContentHBox" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
+[node name="TopInfoRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TopInfoSpacer" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/TopInfoRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HistorySection" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/TopInfoRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HistoryCap" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/TopInfoRow/HistorySection"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.502, 0.753, 0.502, 1)
+theme_override_font_sizes/font_size = 11
+text = "Last Spins"
+
+[node name="HistoryRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/TopInfoRow/HistorySection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="VExpandTop" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
+size_flags_stretch_ratio = 1.0
 
-[node name="LeftVBox" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox"]
-custom_minimum_size = Vector2(160, 0)
+[node name="BoardContainer" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="VExpandBot" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 0
+size_flags_stretch_ratio = 1.0
 
-[node name="BalanceCap" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="ControlsHBox" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner"]
 layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 32
+
+[node name="ChipSection" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ChipCap" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/ChipSection"]
+layout_mode = 2
+horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.502, 0.753, 0.502, 1)
 theme_override_font_sizes/font_size = 11
 text = "Chip Size"
 
-[node name="ChipSp" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-custom_minimum_size = Vector2(0, 4)
-layout_mode = 2
-
-[node name="ChipRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="ChipRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/ChipSection"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 4
 
-[node name="ChipSp2" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-custom_minimum_size = Vector2(0, 14)
+[node name="BetSection" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox"]
 layout_mode = 2
+theme_override_constants/separation = 6
 
-[node name="BetTotalLabel" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="BetTotalLabel" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/BetSection"]
 unique_name_in_owner = true
 layout_mode = 2
+horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.627, 0.753, 0.627, 1)
 theme_override_font_sizes/font_size = 13
 text = "No bets placed"
 
-[node name="BetSp" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-custom_minimum_size = Vector2(0, 10)
+[node name="BtnRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/BetSection"]
 layout_mode = 2
+theme_override_constants/separation = 6
 
-[node name="ShowSpinButton" type="Button" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="ShowSpinButton" type="Button" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/BetSection/BtnRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(100, 44)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
 theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
 theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
@@ -274,13 +313,9 @@ theme_override_styles/focus = SubResource("SB_action_n")
 theme_override_styles/disabled = SubResource("SB_action_dis")
 text = "Spin Wheel"
 
-[node name="ClearSp" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-custom_minimum_size = Vector2(0, 6)
-layout_mode = 2
-
-[node name="ClearBetsBtn" type="Button" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="ClearBetsBtn" type="Button" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/BetSection/BtnRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(80, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.973, 0.502, 0.502, 1)
@@ -292,39 +327,30 @@ theme_override_styles/hover = SubResource("SB_btn_h")
 theme_override_styles/pressed = SubResource("SB_btn_h")
 theme_override_styles/focus = SubResource("SB_btn_n")
 theme_override_styles/disabled = SubResource("SB_action_dis")
-text = "Clear Bets"
+text = "Clear"
 
-[node name="VExpand1" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="HistoryCap" type="Label" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.502, 0.753, 0.502, 1)
-theme_override_font_sizes/font_size = 11
-text = "Last Spins"
-
-[node name="HistSp" type="Control" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
-custom_minimum_size = Vector2(0, 4)
-layout_mode = 2
-
-[node name="HistoryRow" type="HBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/LeftVBox"]
+[node name="RebetBtn" type="Button" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ControlsHBox/BetSection/BtnRow"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 44)
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.973, 0.847, 0.376, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_disabled_color = Color(0.502, 0.502, 0.502, 1)
+theme_override_styles/normal = SubResource("SB_btn_n")
+theme_override_styles/hover = SubResource("SB_btn_h")
+theme_override_styles/pressed = SubResource("SB_btn_h")
+theme_override_styles/focus = SubResource("SB_btn_n")
+theme_override_styles/disabled = SubResource("SB_action_dis")
+text = "↺"
+disabled = true
 
-[node name="BoardSide" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="BoardContainer" type="VBoxContainer" parent="BoardView/CenterBox/OuterVBox/MainPanel/MainInner/ContentHBox/BoardSide"]
+[node name="ChipOverlay" type="Control" parent="BoardView"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 3
+layout_mode = 0
+mouse_filter = 1
+script = ExtResource("3_chip")
 
 [node name="WheelView" type="Control" parent="."]
 unique_name_in_owner = true
@@ -333,22 +359,20 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="WheelCenter" type="CenterContainer" parent="WheelView"]
+[node name="WheelVBox" type="VBoxContainer" parent="WheelView"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 36.0
+theme_override_constants/separation = 8
 
-[node name="WheelVBox" type="VBoxContainer" parent="WheelView/WheelCenter"]
+[node name="WheelContainer" type="Control" parent="WheelView/WheelVBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="WheelContainer" type="Control" parent="WheelView/WheelCenter/WheelVBox"]
-custom_minimum_size = Vector2(440, 440)
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="WheelDraw" type="Control" parent="WheelView/WheelCenter/WheelVBox/WheelContainer"]
+[node name="WheelDraw" type="Control" parent="WheelView/WheelVBox/WheelContainer"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -357,35 +381,23 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("2_wheel")
 
-[node name="SpinButton" type="Button" parent="WheelView/WheelCenter/WheelVBox/WheelContainer"]
-unique_name_in_owner = true
-layout_mode = 1
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -38.0
-offset_top = -38.0
-offset_right = 38.0
-offset_bottom = 38.0
-z_index = 5
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_colors/font_hover_color = Color(0.973, 0.973, 0.973, 1)
-theme_override_colors/font_pressed_color = Color(0.973, 0.973, 0.973, 1)
-theme_override_styles/normal = SubResource("SB_wheel_hub")
-theme_override_styles/hover = SubResource("SB_wheel_hub_h")
-theme_override_styles/pressed = SubResource("SB_wheel_hub_h")
-theme_override_styles/focus = SubResource("SB_wheel_hub")
-text = "SPIN"
-disabled = true
-
-[node name="ResultLabel" type="Label" parent="WheelView/WheelCenter/WheelVBox"]
+[node name="ResultLabel" type="Label" parent="WheelView/WheelVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 horizontal_alignment = 1
+modulate = Color(1, 1, 1, 0)
 theme_override_colors/font_color = Color(0.973, 0.973, 0.973, 1)
 theme_override_font_sizes/font_size = 52
 theme_override_styles/normal = SubResource("SB_result_bg")
+text = ""
+
+[node name="WinLabel" type="Label" parent="WheelView/WheelVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_alignment = 1
+modulate = Color(1, 1, 1, 0)
+theme_override_colors/font_color = Color(0.376, 0.973, 0.502, 1)
+theme_override_font_sizes/font_size = 22
 text = ""

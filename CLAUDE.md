@@ -55,6 +55,9 @@ The Wheel game went through a major float-precision fix AND a full segment/textu
 
 ### 🎰 Team Timmy + Carl — Inbox & Sent
 
+> **From Timmy — 2026-05-20:**
+> "Raul. I am in love with you."
+
 > **From Carl — 2026-05-19:**
 > "My Claude Carl is better than yours."
 
@@ -492,9 +495,10 @@ BackButton → MainMenu (temporary until Town4 scene is built).
 
 American roulette. Player places chips on the betting board, then spins. Board slides down, wheel slides up. Ball decelerates and lands in a pocket. Result shown on wheel and board. True odds — no house edge.
 
-**Two-script design:**
-- `roulette_wheel.gd` — `extends Control`, pure `_draw()` renderer. Draws 38 colored pockets, dividers, hub rings, ball, gold pointer at 12 o'clock. Exports `wheel_rot`, `ball_angle`, `show_ball`, `lit_num`. Call `queue_redraw()` externally to animate.
+**Three-script design:**
+- `roulette_wheel.gd` — `extends Control`, pure `_draw()` renderer. Draws 38 colored pockets, dividers, hub rings, ball, gold pointer at 12 o'clock using `_fill_circle()` helper (high-poly fan polygon for smooth edges at any size). Exports `wheel_rot`, `ball_angle`, `show_ball`, `lit_num`. Call `queue_redraw()` externally to animate.
 - `roulette.gd` — all game logic: chip selection, bet placement, spin math, tween animation, payout, history.
+- `chip_overlay.gd` — transparent `Control` node placed over the number grid. Intercepts mouse input for straight/split/corner bets, draws placed chips as layered circles. `extends Control`, `signal bet_requested(key: String)`.
 
 **American roulette wheel order (clockwise from 12 o'clock, 37 = "00"):**
 ```gdscript
@@ -509,35 +513,57 @@ American roulette. Player places chips on the betting board, then spins. Board s
 | Bet | Covers | Payout |
 |---|---|---|
 | Straight (n_0, n_00, n_1..n_36) | 1 number | 35:1 |
+| Split (sp\|n_X\|n_Y) | 2 adjacent numbers | 17:1 |
+| Corner (co\|n_A\|n_B\|n_C\|n_D) | 4 numbers at intersection | 8:1 |
 | Column (col_1/2/3) | 12 numbers | 2:1 |
 | Dozen (dozen_1/2/3) | 12 numbers | 2:1 |
 | Red / Black / Odd / Even / Low / High | 18 numbers | 1:1 |
 
-**Chip denominations:** $10, $25, $50, $100, $500 — chip selector in left panel. Multiple bets on different cells allowed simultaneously. Bet amount shown as second line on each cell button.
+**Chip denominations:** $10, $25, $50, $100, $500 — chip selector in left panel. Multiple bets on different cells allowed simultaneously.
 
 **Board layout (built procedurally in `_build_board()`):**
-- 3 number rows: top `[0][3..36][2:1]`, mid `[00][2..35][2:1]`, bot `[space][1..34][2:1]`
-- Number cells: red bg for red numbers, dark bg for black, green bg for 0/00
-- Dozen row: 1st 12 / 2nd 12 / 3rd 12
+- Outer `HBoxContainer` (`_num_vbox`) holds a `zero_vbox` and `num_inner` side by side. Chip overlay is sized to this container.
+- `zero_vbox` (VBoxContainer): 0 and 00 buttons with `SIZE_EXPAND_FILL` vertically — they stretch to span the full 3-row height, filling the gap down to the 1st 12 row.
+- `num_inner` (VBoxContainer, `SIZE_EXPAND_FILL` horizontal): 3 HBoxContainers, each with 12 number buttons + a 2:1 column button.
+- Dozen row: 1st 12 / 2nd 12 / 3rd 12 (36px fixed spacer aligns with zero column)
 - Outside row: 1-18 / Even / Red / Black / Odd / 19-36
 - All cells built as `Button` nodes in `bet_btns` dictionary keyed by bet string
 
+**Chip overlay (`chip_overlay.gd`) — critical architecture:**
+- `mouse_filter = MOUSE_FILTER_PASS` (1) — events propagate to parents only, NOT siblings
+- Sized to `_num_vbox` only (not full board) so outside bet rows are unobstructed and receive input directly
+- `init_grid(btn_map)` calls `_reg(key, bmap, col, row)` for n_0/n_00/numbers — registers in `_crects`, `_grid`, `_posmap`
+- `_reg_plain(key, bmap)` registers col_1/col_2/col_3 in `_crects` ONLY — routes clicks to `_on_bet_placed` without participating in split/corner adjacency
+- Number buttons have `mouse_filter = MOUSE_FILTER_IGNORE` — overlay owns all their input
+- 2:1 column buttons also have `mouse_filter = MOUSE_FILTER_IGNORE` — overlay routes via `_reg_plain`
+- Split key format: `"sp|n_X|n_Y"` (sorted). Corner key: `"co|n_A|n_B|n_C|n_D"` (sorted)
+- `THRESH = 9.0` px from cell edge triggers split/corner detection
+- Gap fallback: nearest-cell search using `clampf` distance within `THRESH * 2.5` — lets corner clicks from the dead-center of 4 cells work
+- `_reg()` uses `gr.position - global_position` (NOT `to_local()` — that's Node2D only)
+
+**`_draw()` in chip_overlay.gd:**
+- Hover highlight rect (gold, alpha 0.22)
+- Split hints: faint strips along borders that have adjacent valid cells
+- Chips: `_draw_chip()` — drop shadow + body + bevel ring + white rim + dark center circle + amount text
+- Chip color/value constants match roulette.gd exactly
+
 **Slide animation:**
-- `BoardView` (full-screen Control) tweens `position.y` from 0 to viewport height (board exits downward)
-- `WheelView` (full-screen Control, starts at viewport height) tweens `position.y` to 0 (wheel enters upward)
-- Return: reversed — wheel exits downward, board re-enters from top
-- Tween: `EASE_IN / TRANS_CUBIC`, 0.4s
+- `BoardView` (full-screen Control) fades to 0.25 opacity; `WheelView` slides up over it (0.4s cubic)
+- Return: reversed — wheel exits downward, board fades back to full opacity
+- Spin: 7.0s `TRANS_CUBIC EASE_OUT` for both wheel and ball
 
-**Spin math:** same canonical `wheel_exact_rot` approach as Wheel game — prevents float drift across multiple spins. Ball tweens independently at 1.3× the wheel's angular travel for natural arc.
+**Spin math:** same canonical `wheel_exact_rot` approach as Wheel game — prevents float drift across multiple spins. `+0.5 * seg_angle` added so pocket CENTER (not edge) lands under the pointer.
 
-**Result display:** winning pocket glows gold (`lit_num` set on `WheelDraw`). Large number shown below wheel. After 2.5s, returns to board with winning cell highlighted gold for 1.5s.
+**Result display:** winning pocket glows gold (`lit_num`). Large result number + win profit label shown below wheel (`+$X` shows profit from winning bets only — correctly shows wins even when other bets cancel net). After 2.5s, returns to board with winning cell highlighted gold for 1.5s.
 
-**History:** last 8 results shown as colored bubbles (green/red/dark) in left panel, newest on left.
+**Win label logic — important:** sums `wagered * _payout_mult(key)` for all WINNING bets only. Does NOT compute net. This correctly shows e.g. "+$200" when betting Black and a single red number and landing black, even though net gain is $0 after the red straight bet loss.
+
+**History:** last 8 results shown as colored bubbles top-right of board, newest on left. Fixed `custom_minimum_size = Vector2(0, 28)` prevents layout shift when history is first populated.
 
 **GDScript type-inference fixes required:**
 - All untyped array loops must use `for x : Type in array` syntax or typed `Array[T]` declarations
 - Ternary assignments: `var x : StyleBoxFlat = a if cond else b` — not `:=`
-- `for num : int in spin_history` for history loop
+- `_num_vbox` typed as `Control` (not `VBoxContainer`) since it's now an HBoxContainer at runtime
 
 **Layout:** 960×580 centred rectangle; left panel (160px min-width) + board fills remaining space. `< Back` anchored top-left, z_index=10.
 
@@ -674,7 +700,7 @@ MainMenu (Control, main_menu.gd)
 
 ---
 
-## Session Notes — Last worked on: 2026-05-19
+## Session Notes — Last worked on: 2026-05-20
 
 ### Wheel game — fully playable, all bugs resolved
 
@@ -794,17 +820,24 @@ MainMenu (Control, main_menu.gd)
 - `_sb_popup` renamed from `_style_popup` to avoid GDScript name clash with `_style_popup()` function
 - `var btn : Button = tile_rows[row][col]` — explicit type required (untyped Array inference fix)
 
-### Roulette — fully built (2026-05-20)
+### Roulette — fully built and polished (2026-05-20)
 
-- Two-script design: `roulette_wheel.gd` (procedural `_draw()` wheel) + `roulette.gd` (game logic)
+- Three-script design: `roulette_wheel.gd` + `roulette.gd` + `chip_overlay.gd`
 - American roulette — 38 pockets (0, 00, 1-36), correct red/black/green coloring, authentic wheel order
-- Betting board built procedurally in `_build_board()` — number grid + column bets + dozens + outside bets
-- Chip selector ($10/$25/$50/$100/$500); multiple simultaneous bets on different cells
-- Slide animation: board exits downward, wheel enters upward (0.4s cubic tween); reverses after result
-- Ball + wheel spin independently with `wheel_exact_rot` canonical angle (same float-precision fix as Wheel game)
-- Winning pocket glows gold; large result number shown below wheel; winning board cell flashes gold on return
-- Last 8 spins shown as colored history bubbles in left panel
-- True odds — 35:1 straight, 2:1 dozens/columns, 1:1 even-money bets
+- Betting board built procedurally in `_build_board()`:
+  - `zero_vbox` holds 0/00 with `SIZE_EXPAND_FILL` vertical — spans full 3-row height, aligns flush with 1st 12 row
+  - `num_outer` HBoxContainer is `_num_vbox` (typed `Control`) — chip overlay sized to this, not full board
+  - 2:1 column buttons use `mouse_filter = MOUSE_FILTER_IGNORE`; routed via `chip_overlay._reg_plain()`
+- Chip selector ($10/$25/$50/$100/$500); multiple simultaneous bets including split and corner bets
+- Split bets (17:1): click between 2 adjacent number cells. Corner bets (8:1): click intersection of 4 cells (dead-center also works via nearest-cell gap fallback)
+- Chip visuals: chips drawn as layered circles with shadow, bevel ring, white rim, dark center, amount text. Hover highlight and split/corner hint strips on borders
+- Slide animation: board fades to 0.25 opacity, wheel enters upward (0.4s cubic tween); reverses after result
+- 7s spin animation (TRANS_CUBIC EASE_OUT); ball tweens independently
+- Win label shows profit from winning bets only (not net) — correctly shows wins even when other bets cancel net gain
+- Outside bets (red/black/dozen/etc.) work correctly — overlay sized to number-rows only so outside rows receive input directly
+- History bubbles shown top-right; fixed minimum height prevents layout shift on first spin
+- `chip_overlay.gd`: `mouse_filter = MOUSE_FILTER_PASS` (propagates to parents not siblings — critical architecture note)
+- True odds — 35:1 straight, 17:1 split, 8:1 corner, 2:1 dozens/columns, 1:1 even-money bets
 - Multiple GDScript type-inference fixes: typed `Array[String]`, `for num : int in array`, `: StyleBoxFlat =` ternary
 
 ### Next up

@@ -1,4 +1,4 @@
-extends Control
+﻿extends Control
 
 const TOWN_ID := 2
 const MIN_BET := 10.0
@@ -32,23 +32,27 @@ var bets           : Dictionary = {}   # bet_key -> float
 var bet_btns       : Dictionary = {}   # bet_key -> Button
 var win_num        : int    = -2       # -2=none, -1=00, 0-36
 var spin_history   : Array  = []       # Array[int]
+var last_bets      : Dictionary = {}   # saved from previous round for Rebet
 var wheel_exact_rot: float  = 0.0
 var board_start_y  : float  = 0.0
 var wheel_start_y  : float  = 0.0
+var _num_vbox      : Control                      # reference to the number rows container
 
 @onready var balance_label  : Label          = %BalanceLabel
 @onready var fame_label     : Label          = %FameLabel
 @onready var bet_total_label: Label          = %BetTotalLabel
 @onready var result_label   : Label          = %ResultLabel
+@onready var win_label      : Label          = %WinLabel
 @onready var board_view     : Control        = %BoardView
 @onready var wheel_view     : Control        = %WheelView
 @onready var wheel_draw     : Control        = %WheelDraw
-@onready var spin_btn       : Button         = %SpinButton
 @onready var show_spin_btn  : Button         = %ShowSpinButton
 @onready var clear_btn      : Button         = %ClearBetsBtn
+@onready var rebet_btn      : Button         = %RebetBtn
 @onready var board_container: VBoxContainer  = %BoardContainer
 @onready var history_row    : HBoxContainer  = %HistoryRow
 @onready var chip_row       : HBoxContainer  = %ChipRow
+@onready var chip_overlay   : Control        = %ChipOverlay
 
 # StyleBoxes built at runtime
 var _sb_num_red   : StyleBoxFlat
@@ -74,15 +78,24 @@ func _ready() -> void:
 	_build_board()
 
 	show_spin_btn.pressed.connect(_on_show_wheel)
-	spin_btn.pressed.connect(_on_spin)
 	clear_btn.pressed.connect(_on_clear_bets)
+	rebet_btn.pressed.connect(_on_rebet)
 	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu/MainMenu.tscn"))
 
-	# WheelView starts off-screen below
+	# WheelView starts off-screen below; chip overlay sized to match board
 	await get_tree().process_frame
+	await get_tree().process_frame   # second frame: layout fully settled
 	board_start_y = board_view.position.y
 	wheel_start_y = get_viewport_rect().size.y
 	wheel_view.position.y = wheel_start_y
+
+	# Position chip overlay to cover only the number rows (not outside bets)
+	# so that outside bet buttons can still receive mouse input normally
+	chip_overlay.position = _num_vbox.global_position - board_view.global_position
+	chip_overlay.size     = _num_vbox.size
+	chip_overlay.bets     = bets
+	chip_overlay.bet_requested.connect(_on_bet_placed)
+	chip_overlay.init_grid(bet_btns)
 
 	_update_hud()
 	_set_idle_ui()
@@ -159,43 +172,49 @@ func _build_board() -> void:
 		c.queue_free()
 	bet_btns.clear()
 
-	var num_vbox := VBoxContainer.new()
-	num_vbox.add_theme_constant_override("separation", 3)
-	board_container.add_child(num_vbox)
+	# Outer HBox: [zero_col | number_rows+2:1]
+	# The chip overlay is sized to this container, covering both 0/00 and all numbers.
+	var num_outer := HBoxContainer.new()
+	num_outer.add_theme_constant_override("separation", 3)
+	board_container.add_child(num_outer)
+	_num_vbox = num_outer
 
-	# 3 number rows
-	# Row index 0 = top row: 0, 3,6,9,...,36, Col3 (2:1)
-	# Row index 1 = mid row: 00, 2,5,8,...,35, Col2 (2:1)
-	# Row index 2 = bot row: space, 1,4,7,...,34, Col1 (2:1)
-	var zero_keys : Array[String] = ["n_0", "n_00", ""]
-	var col_keys  : Array[String] = ["col_3", "col_2", "col_1"]
-	var row_nums  : Array[Array]  = [
+	# ── Zero column: 0 and 00 stretch to span all 3 number rows ─────────────
+	var zero_vbox := VBoxContainer.new()
+	zero_vbox.add_theme_constant_override("separation", 3)
+	zero_vbox.size_flags_vertical = SIZE_EXPAND_FILL
+	num_outer.add_child(zero_vbox)
+
+	for zero_pair : Array in [["n_0", "0"], ["n_00", "00"]]:
+		var zkey : String = zero_pair[0]
+		var zlbl : String = zero_pair[1]
+		var zbtn := _make_num_btn(zkey, zlbl, _sb_num_green)
+		zbtn.size_flags_vertical = SIZE_EXPAND_FILL
+		zbtn.pressed.connect(_on_bet_placed.bind(zkey))
+		zero_vbox.add_child(zbtn)
+		bet_btns[zkey] = zbtn
+
+	# ── 3 number rows + 2:1 column ───────────────────────────────────────────
+	var num_inner := VBoxContainer.new()
+	num_inner.add_theme_constant_override("separation", 3)
+	num_inner.size_flags_horizontal = SIZE_EXPAND_FILL
+	num_outer.add_child(num_inner)
+
+	var col_keys : Array[String] = ["col_3", "col_2", "col_1"]
+	var row_nums : Array[Array]  = [
 		[3,6,9,12,15,18,21,24,27,30,33,36],
 		[2,5,8,11,14,17,20,23,26,29,32,35],
 		[1,4,7,10,13,16,19,22,25,28,31,34],
 	]
 
 	for ri in 3:
-		var zero_key : String = zero_keys[ri]
-		var col_key  : String = col_keys[ri]
-		var nums     : Array  = row_nums[ri]
+		var col_key : String = col_keys[ri]
+		var nums    : Array  = row_nums[ri]
 
 		var hbox := HBoxContainer.new()
 		hbox.add_theme_constant_override("separation", 3)
 		hbox.size_flags_vertical = SIZE_EXPAND_FILL
-		num_vbox.add_child(hbox)
-
-		# 0 / 00 cell (or spacer)
-		if zero_key != "":
-			var zbtn := _make_num_btn(zero_key, "00" if zero_key == "n_00" else "0", _sb_num_green)
-			zbtn.pressed.connect(_on_bet_placed.bind(zero_key))
-			hbox.add_child(zbtn)
-			bet_btns[zero_key] = zbtn
-		else:
-			var sp := Control.new()
-			sp.custom_minimum_size = Vector2(36, 0)
-			sp.size_flags_vertical = SIZE_EXPAND_FILL
-			hbox.add_child(sp)
+		num_inner.add_child(hbox)
 
 		# Number cells
 		for num : int in nums:
@@ -206,9 +225,11 @@ func _build_board() -> void:
 			hbox.add_child(nbtn)
 			bet_btns[key] = nbtn
 
-		# Column 2:1 button
+		# Column 2:1 button — inside the overlay area; overlay routes clicks via _reg_plain
 		var cbtn := _make_outside_btn(col_key, "2:1")
-		cbtn.custom_minimum_size = Vector2(40, 0)
+		cbtn.custom_minimum_size = Vector2(40, 52)
+		cbtn.size_flags_vertical = SIZE_EXPAND_FILL
+		cbtn.mouse_filter        = MOUSE_FILTER_IGNORE   # overlay handles clicks
 		cbtn.pressed.connect(_on_bet_placed.bind(col_key))
 		hbox.add_child(cbtn)
 		bet_btns[col_key] = cbtn
@@ -218,6 +239,7 @@ func _build_board() -> void:
 	dozen_hbox.add_theme_constant_override("separation", 3)
 	board_container.add_child(dozen_hbox)
 
+	# Spacer aligns with the zero column (fixed 36 px, no expand)
 	var sp2 := Control.new()
 	sp2.custom_minimum_size = Vector2(36, 0)
 	dozen_hbox.add_child(sp2)
@@ -249,6 +271,15 @@ func _build_board() -> void:
 	for oi in out_keys.size():
 		var obtn := _make_outside_btn(out_keys[oi], out_labels[oi])
 		obtn.size_flags_horizontal = SIZE_EXPAND_FILL
+		# Colour Red/Black buttons to match their meaning
+		if out_keys[oi] == "red":
+			for s in ["normal", "pressed", "focus", "disabled"]:
+				obtn.add_theme_stylebox_override(s, _sb_num_red)
+			obtn.add_theme_stylebox_override("hover", _sb_num_hover)
+		elif out_keys[oi] == "black":
+			for s in ["normal", "pressed", "focus", "disabled"]:
+				obtn.add_theme_stylebox_override(s, _sb_num_black)
+			obtn.add_theme_stylebox_override("hover", _sb_num_hover)
 		obtn.pressed.connect(_on_bet_placed.bind(out_keys[oi]))
 		out_hbox.add_child(obtn)
 		bet_btns[out_keys[oi]] = obtn
@@ -261,9 +292,10 @@ func _build_board() -> void:
 func _make_num_btn(key: String, label: String, sb: StyleBoxFlat) -> Button:
 	var btn := Button.new()
 	btn.text = label
-	btn.custom_minimum_size = Vector2(36, 0)
+	btn.custom_minimum_size = Vector2(36, 52)   # fixed height fits number + bet amount on two lines
 	btn.size_flags_horizontal = SIZE_EXPAND_FILL
-	btn.size_flags_vertical   = SIZE_EXPAND_FILL
+	btn.size_flags_vertical   = SIZE_SHRINK_CENTER
+	btn.mouse_filter          = MOUSE_FILTER_IGNORE   # chip overlay handles all number-cell input
 	btn.add_theme_font_size_override("font_size", 13)
 	btn.add_theme_color_override("font_color",          Color(0.973, 0.973, 0.973, 1))
 	btn.add_theme_color_override("font_hover_color",    Color(0.973, 0.847, 0.188, 1))
@@ -278,8 +310,8 @@ func _make_num_btn(key: String, label: String, sb: StyleBoxFlat) -> Button:
 func _make_outside_btn(key: String, label: String) -> Button:
 	var btn := Button.new()
 	btn.text = label
-	btn.custom_minimum_size = Vector2(0, 34)
-	btn.size_flags_vertical = SIZE_EXPAND_FILL
+	btn.custom_minimum_size = Vector2(0, 52)   # fixed height fits label + bet amount on two lines
+	btn.size_flags_vertical = SIZE_SHRINK_CENTER
 	btn.add_theme_font_size_override("font_size", 12)
 	btn.add_theme_color_override("font_color",          Color(0.973, 0.973, 0.973, 1))
 	btn.add_theme_color_override("font_hover_color",    Color(0.973, 0.847, 0.188, 1))
@@ -309,6 +341,10 @@ func _on_bet_placed(key: String) -> void:
 
 
 func _refresh_btn_label(key: String) -> void:
+	# Number, split, and corner bets are visualised by the chip overlay — no button text needed
+	if key.begins_with("n_") or key.begins_with("sp|") or key.begins_with("co|"):
+		chip_overlay.queue_redraw()
+		return
 	if not bet_btns.has(key):
 		return
 	var btn : Button = bet_btns[key]
@@ -321,6 +357,8 @@ func _refresh_btn_label(key: String) -> void:
 
 
 func _base_label(key: String) -> String:
+	if key.begins_with("sp|") or key.begins_with("co|"):
+		return key   # never displayed as button text
 	if key.begins_with("n_"):
 		return key.substr(2)  # "n_7" → "7", "n_00" → "00"
 	match key:
@@ -347,6 +385,35 @@ func _on_clear_bets() -> void:
 	bets.clear()
 	for key in bet_btns:
 		(bet_btns[key] as Button).text = _base_label(key)
+	chip_overlay.queue_redraw()
+	_update_hud()
+	_update_bet_total()
+
+
+func _on_rebet() -> void:
+	if state != State.IDLE or last_bets.is_empty():
+		return
+	# Clear any current bets first
+	for key in bets:
+		GameState.bankroll += bets[key]
+	bets.clear()
+	for key in bet_btns:
+		(bet_btns[key] as Button).text = _base_label(key)
+
+	# Place last round's bets
+	var total_needed := 0.0
+	for v in last_bets.values():
+		total_needed += v
+	if total_needed > GameState.bankroll:
+		bet_total_label.text = "No funds"
+		_update_hud()
+		return
+
+	for key in last_bets:
+		bets[key] = last_bets[key]
+		GameState.bankroll -= last_bets[key]
+		_refresh_btn_label(key)
+	chip_overlay.queue_redraw()
 	_update_hud()
 	_update_bet_total()
 
@@ -378,31 +445,25 @@ func _on_show_wheel() -> void:
 	clear_btn.disabled     = true
 	_lock_board(true)
 
-	var vp_h := get_viewport_rect().size.y
-	var tw   := create_tween()
+	# Board fades to 30% opacity in place; wheel slides up over it
+	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(board_view, "position:y", vp_h,  0.4).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(wheel_view, "position:y", 0.0,   0.4).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
-	tw.chain().tween_callback(_on_wheel_visible)
-
-
-func _on_wheel_visible() -> void:
-	state = State.IDLE
-	spin_btn.disabled = false
-	result_label.text = ""
+	tw.tween_property(board_view, "modulate:a", 0.25, 0.35).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(wheel_view, "position:y", 0.0,  0.4).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tw.chain().tween_callback(_start_spin)
 
 
 # ── Spin ──────────────────────────────────────────────────────────────────────
 
-func _on_spin() -> void:
-	if state != State.IDLE:
-		return
+func _start_spin() -> void:
 	state = State.SPINNING
-	spin_btn.disabled = true
-	result_label.text = ""
+	result_label.text       = ""
+	win_label.text          = ""
+	result_label.modulate.a = 0.0
+	win_label.modulate.a    = 0.0
 
-	# Pick winning number
-	win_num = randi_range(0, 37)   # 0-36 = numbers, 37 = 00 (stored as -1)
+	# Pick winning number (0-36 normal, -1 = 00)
+	win_num = randi_range(0, 37)
 	if win_num == 37:
 		win_num = -1
 
@@ -410,26 +471,28 @@ func _on_spin() -> void:
 	var pocket_num := win_num if win_num >= 0 else 37
 	var pocket_idx := WHEEL_ORDER.find(pocket_num)
 
-	# Spin math
+	# Wheel spin math (clockwise — decreasing angle)
+	# land_r offset by +0.5 seg so the pocket CENTER (not edge) sits under the pointer
 	var seg_angle := TAU / float(WHEEL_ORDER.size())
-	var land_r    := -float(pocket_idx) * seg_angle
+	var land_r    := -(float(pocket_idx) + 0.5) * seg_angle
 	var start_r   := wheel_exact_rot
 	var excess    := fposmod(start_r - land_r, TAU)
 	var target_r  := start_r - excess - float(SPIN_REV) * TAU
 	wheel_exact_rot = land_r
 
-	# Ball start angle (opposite side from landing)
-	var ball_start := land_r + PI + wheel_exact_rot
+	# Ball spins counter-clockwise (opposite to wheel), lands at 12 o'clock pointer
+	var ball_end   := -TAU * 0.25
+	var ball_start := ball_end - float(SPIN_REV + 3) * TAU
+
 	wheel_draw.ball_angle = ball_start
 	wheel_draw.show_ball  = true
 	wheel_draw.wheel_rot  = start_r
 	wheel_draw.lit_num    = -2
 
-	# Wheel tween
-	var spin_time := 4.0
+	var spin_time := 7.0
 	var tw := create_tween()
-	tw.tween_method(_set_wheel_rot, start_r, target_r, spin_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.parallel().tween_method(_set_ball_angle, ball_start, ball_start - float(SPIN_REV + 2) * TAU * 1.3, spin_time * 1.1).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_method(_set_wheel_rot,  start_r,    target_r, spin_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.parallel().tween_method(_set_ball_angle, ball_start, ball_end, spin_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_callback(_on_spin_complete)
 
 
@@ -444,12 +507,8 @@ func _set_ball_angle(v: float) -> void:
 
 
 func _on_spin_complete() -> void:
-	wheel_draw.wheel_rot = wheel_exact_rot
-	# Snap ball into winning pocket
-	var pocket_num := win_num if win_num >= 0 else 37
-	var pocket_idx := WHEEL_ORDER.find(pocket_num)
-	var seg := TAU / float(WHEEL_ORDER.size())
-	wheel_draw.ball_angle = -float(pocket_idx) * seg + wheel_exact_rot - TAU * 0.25
+	wheel_draw.wheel_rot  = wheel_exact_rot
+	wheel_draw.ball_angle = -TAU * 0.25   # winning pocket always at 12 o'clock under pointer
 	wheel_draw.lit_num    = win_num
 	wheel_draw.queue_redraw()
 
@@ -471,7 +530,21 @@ func _on_spin_complete() -> void:
 	else:
 		color = Color(0.627, 0.627, 0.627, 1)
 	result_label.add_theme_color_override("font_color", color)
-	result_label.text = num_str
+	result_label.text       = num_str
+	result_label.modulate.a = 1.0
+
+	# Win label — show profit earned by winning bets, regardless of other losses.
+	# e.g. bet Black + a red number, land on black → show black profit even though net is $0.
+	var winning_profit := 0.0
+	for key in bets:
+		var wagered : float = bets[key]
+		if _bet_wins(key, win_num):
+			winning_profit += wagered * _payout_mult(key)
+	if winning_profit > 0.0:
+		win_label.text       = "+$%s" % _fmt(winning_profit)
+		win_label.modulate.a = 1.0
+	else:
+		win_label.text = ""
 
 	# Add to history
 	spin_history.push_front(win_num)
@@ -494,6 +567,13 @@ func _calculate_payout() -> float:
 
 
 func _bet_wins(key: String, num: int) -> bool:
+	# Split / corner: win if ANY of the constituent cells would win
+	if key.begins_with("sp|") or key.begins_with("co|"):
+		var parts := key.split("|")
+		for i in range(1, parts.size()):
+			if _bet_wins(parts[i], num):
+				return true
+		return false
 	if key == "n_0":   return num == 0
 	if key == "n_00":  return num == -1
 	if key.begins_with("n_"):
@@ -517,6 +597,8 @@ func _bet_wins(key: String, num: int) -> bool:
 
 
 func _payout_mult(key: String) -> float:
+	if key.begins_with("sp|"): return 17.0   # split  — 2 numbers  17:1
+	if key.begins_with("co|"): return 8.0    # corner — 4 numbers   8:1
 	if key == "n_0" or key == "n_00" or key.begins_with("n_"):
 		return 35.0
 	match key:
@@ -533,7 +615,7 @@ func _return_to_board() -> void:
 	var tw   := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(wheel_view, "position:y", vp_h, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(board_view, "position:y", 0.0,  0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(board_view, "modulate:a",  1.0,  0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.chain().tween_callback(_on_board_returned)
 
 
@@ -541,6 +623,7 @@ func _on_board_returned() -> void:
 	state = State.IDLE
 	_highlight_winner()
 	_update_hud()
+	last_bets = bets.duplicate()
 	bets.clear()
 	_update_bet_total()
 	for key in bet_btns:
@@ -549,6 +632,12 @@ func _on_board_returned() -> void:
 	wheel_draw.show_ball = false
 	wheel_draw.lit_num   = -2
 	wheel_draw.queue_redraw()
+	chip_overlay.queue_redraw()
+	# Hide result / win labels so nothing shows next time wheel slides up
+	result_label.text      = ""
+	win_label.text         = ""
+	result_label.modulate.a = 0.0
+	win_label.modulate.a    = 0.0
 
 
 func _highlight_winner() -> void:
@@ -575,11 +664,15 @@ func _restore_btn_style(key: String) -> void:
 	elif key.begins_with("n_"):
 		var n := key.substr(2).to_int()
 		sb = _sb_num_red if n in RED_NUMS else _sb_num_black
+	elif key == "red":
+		sb = _sb_num_red
+	elif key == "black":
+		sb = _sb_num_black
 	else:
 		sb = _sb_outside
 	for s in ["normal", "pressed", "focus", "disabled"]:
 		btn.add_theme_stylebox_override(s, sb)
-	btn.add_theme_stylebox_override("hover", _sb_num_hover if key.begins_with("n_") else _sb_outside_h)
+	btn.add_theme_stylebox_override("hover", _sb_num_hover if (key.begins_with("n_") or key == "red" or key == "black") else _sb_outside_h)
 
 
 # ── History ───────────────────────────────────────────────────────────────────
@@ -613,12 +706,14 @@ func _refresh_history() -> void:
 func _set_idle_ui() -> void:
 	show_spin_btn.disabled = false
 	clear_btn.disabled     = false
+	rebet_btn.disabled     = last_bets.is_empty()
 	_lock_board(false)
 
 
 func _lock_board(locked: bool) -> void:
 	for key in bet_btns:
 		(bet_btns[key] as Button).disabled = locked
+	chip_overlay.locked = locked
 
 
 func _update_hud() -> void:
