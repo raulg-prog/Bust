@@ -1,16 +1,8 @@
-@tool
 extends Node2D
 
-const MAP_W   : int = 40
-const MAP_H   : int = 20
-const TILE_SZ : int = 32
-const WORLD_W : int = MAP_W * TILE_SZ   # 1280
-const WORLD_H : int = MAP_H * TILE_SZ   # 640
-
-const TOWN2_SCENE := "res://scenes/Towns/cascade.tscn"
-const TREE_SCENE  := preload("res://scenes/Towns/Objects/PineTree.tscn")
-const TOWN_NAME   := "Flipside"
-const TOWN_ID     := 0
+const TOWN_NAME   := "Cascade"
+const TOWN_ID     := 1
+const TOWN1_SCENE := "res://scenes/Towns/Town1.tscn"
 
 # GBA colours
 const COL_GOLD   := Color(0.973, 0.847, 0.188, 1)
@@ -21,26 +13,17 @@ const COL_YELLOW := Color(0.973, 0.973, 0.439, 1)
 const COL_PANEL  := Color(0.063, 0.031, 0.125, 0.90)
 const COL_BORDER := Color(0.314, 0.220, 0.565, 1)
 
-var _player      : Node
-var _hud         : CanvasLayer
-var _bankroll_lbl: Label
-var _fame_fill   : Panel
-var _fade_rect   : ColorRect
-var _pause_panel : Panel
-var _pause_br_lbl: Label
-var _paused      : bool = false
-var _fading      : bool = false
-
-
-@export_tool_button("Place Tree Border")
-var _btn_place_trees: Callable = _spawn_tree_border
+var _hud          : CanvasLayer
+var _bankroll_lbl : Label
+var _fame_fill    : Panel
+var _fade_rect    : ColorRect
+var _pause_panel  : Panel
+var _pause_br_lbl : Label
+var _paused       : bool = false
+var _fading       : bool = false
 
 
 func _ready() -> void:
-	if Engine.is_editor_hint():
-		return
-	_player = find_child("Player", true, false)
-	_setup_camera()
 	_wire_doors()
 	_build_hud()
 	_fade_in()
@@ -52,26 +35,18 @@ func _ready() -> void:
 		_show_centre_popup("+" + _fmt(earned) + " Fame  *", COL_BLUE, 2.2)
 
 
-func _setup_camera() -> void:
-	var cam := find_child("Camera2D", true, false) as Camera2D
-	if not cam:
-		return
-	cam.limit_left   = 0
-	cam.limit_top    = 0
-	cam.limit_right  = WORLD_W
-	cam.limit_bottom = WORLD_H
-
-
 func _wire_doors() -> void:
-	var hilo_door := find_child("HiLoBuilding", true, false)
-	if hilo_door:
-		hilo_door.get_node("Door").body_entered.connect(_on_hilo_door_entered)
-	var coinflip_door := find_child("CoinFlipBuilding", true, false)
-	if coinflip_door:
-		coinflip_door.get_node("Door").body_entered.connect(_on_coinflip_door_entered)
-	var town2_exit := find_child("EnterCascade", true, false)
-	if town2_exit:
-		town2_exit.body_entered.connect(_on_town2_exit_entered)
+	var wheel_door := find_child("WheelDoor", true, false)
+	if wheel_door:
+		wheel_door.body_entered.connect(_on_wheel_door_entered)
+
+	var plinko_door := find_child("PlinkoDoor", true, false)
+	if plinko_door:
+		plinko_door.body_entered.connect(_on_plinko_door_entered)
+
+	var town1_exit := find_child("Town1Exit", true, false)
+	if town1_exit:
+		town1_exit.body_entered.connect(_on_town1_exit_entered)
 
 
 # ─── HUD BUILDER ─────────────────────────────────────────────────────────────
@@ -88,8 +63,8 @@ func _build_hud() -> void:
 
 func _make_stylebox(bg: Color, border: Color = COL_BORDER, bw: int = 2) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = bg
-	sb.border_color = border
+	sb.bg_color            = bg
+	sb.border_color        = border
 	sb.border_width_left   = bw
 	sb.border_width_right  = bw
 	sb.border_width_top    = bw
@@ -127,7 +102,8 @@ func _build_info_panel() -> void:
 	var bar_bg := Panel.new()
 	bar_bg.position = Vector2(48, 55)
 	bar_bg.size     = Vector2(164, 10)
-	bar_bg.add_theme_stylebox_override("panel", _make_stylebox(Color(0.094, 0.094, 0.157, 1), Color(0.2, 0.2, 0.35, 1), 1))
+	bar_bg.add_theme_stylebox_override("panel", _make_stylebox(
+		Color(0.094, 0.094, 0.157, 1), Color(0.2, 0.2, 0.35, 1), 1))
 	panel.add_child(bar_bg)
 
 	_fame_fill          = Panel.new()
@@ -150,7 +126,8 @@ func _build_pause_panel() -> void:
 	_pause_panel.size     = Vector2(280, 210)
 	_pause_panel.position = Vector2(640 - 140, 360 - 105)
 	_pause_panel.visible  = false
-	_pause_panel.add_theme_stylebox_override("panel", _make_stylebox(Color(0.047, 0.024, 0.094, 0.96)))
+	_pause_panel.add_theme_stylebox_override("panel",
+		_make_stylebox(Color(0.047, 0.024, 0.094, 0.96)))
 	_hud.add_child(_pause_panel)
 
 	var title := Label.new()
@@ -162,19 +139,19 @@ func _build_pause_panel() -> void:
 	title.add_theme_color_override("font_color", COL_GOLD)
 	_pause_panel.add_child(title)
 
-	_pause_br_lbl                       = Label.new()
-	_pause_br_lbl.horizontal_alignment  = HORIZONTAL_ALIGNMENT_CENTER
-	_pause_br_lbl.size                  = Vector2(280, 28)
-	_pause_br_lbl.position              = Vector2(0, 62)
+	_pause_br_lbl                      = Label.new()
+	_pause_br_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_pause_br_lbl.size                 = Vector2(280, 28)
+	_pause_br_lbl.position             = Vector2(0, 62)
 	_pause_br_lbl.add_theme_font_size_override("font_size", 13)
 	_pause_br_lbl.add_theme_color_override("font_color", COL_GREEN)
 	_pause_panel.add_child(_pause_br_lbl)
 
 	var fame_lbl := Label.new()
-	fame_lbl.name                  = "PauseFame"
-	fame_lbl.horizontal_alignment  = HORIZONTAL_ALIGNMENT_CENTER
-	fame_lbl.size                  = Vector2(280, 24)
-	fame_lbl.position              = Vector2(0, 88)
+	fame_lbl.name                 = "PauseFame"
+	fame_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	fame_lbl.size                 = Vector2(280, 24)
+	fame_lbl.position             = Vector2(0, 88)
 	fame_lbl.add_theme_font_size_override("font_size", 11)
 	fame_lbl.add_theme_color_override("font_color", COL_BLUE)
 	_pause_panel.add_child(fame_lbl)
@@ -185,21 +162,21 @@ func _build_pause_panel() -> void:
 
 
 func _add_pause_btn(txt: String, pos: Vector2, cb: Callable) -> void:
-	var btn      := Button.new()
-	btn.text      = txt
-	btn.size      = Vector2(200, 34)
-	btn.position  = pos
+	var btn     := Button.new()
+	btn.text     = txt
+	btn.size     = Vector2(200, 34)
+	btn.position = pos
 	btn.pressed.connect(cb)
 	_pause_panel.add_child(btn)
 
 
 func _show_town_name_card() -> void:
 	var card := Label.new()
-	card.text                  = TOWN_NAME
-	card.horizontal_alignment  = HORIZONTAL_ALIGNMENT_CENTER
-	card.size                  = Vector2(300, 52)
-	card.position              = Vector2(640 - 150, 56)
-	card.modulate.a            = 0.0
+	card.text                 = TOWN_NAME
+	card.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.size                 = Vector2(300, 52)
+	card.position             = Vector2(640 - 150, 56)
+	card.modulate.a           = 0.0
 	card.add_theme_font_size_override("font_size", 38)
 	card.add_theme_color_override("font_color", COL_GOLD)
 	_hud.add_child(card)
@@ -214,11 +191,11 @@ func _show_town_name_card() -> void:
 
 func _show_centre_popup(text: String, colour: Color, duration: float) -> void:
 	var lbl := Label.new()
-	lbl.text                  = text
-	lbl.horizontal_alignment  = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.size                  = Vector2(380, 40)
-	lbl.position              = Vector2(640 - 190, 120)
-	lbl.modulate.a            = 0.0
+	lbl.text                 = text
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.size                 = Vector2(380, 40)
+	lbl.position             = Vector2(640 - 190, 120)
+	lbl.modulate.a           = 0.0
 	lbl.add_theme_font_size_override("font_size", 18)
 	lbl.add_theme_color_override("font_color", colour)
 	_hud.add_child(lbl)
@@ -245,7 +222,7 @@ func _fade_out_to(scene_path: String) -> void:
 	_fading = true
 	if _paused:
 		get_tree().paused = false
-		_paused = false
+		_paused           = false
 		_pause_panel.visible = false
 	var tw := create_tween()
 	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
@@ -258,7 +235,7 @@ func _fade_out_to(scene_path: String) -> void:
 func _toggle_pause() -> void:
 	if _fading:
 		return
-	_paused = !_paused
+	_paused           = !_paused
 	get_tree().paused = _paused
 	_pause_panel.visible = _paused
 	if _paused:
@@ -271,8 +248,6 @@ func _toggle_pause() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Engine.is_editor_hint():
-		return
 	if event is InputEventKey and not event.echo and event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
 
@@ -280,7 +255,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ─── PROCESS ─────────────────────────────────────────────────────────────────
 
 func _process(_delta: float) -> void:
-	if Engine.is_editor_hint() or _fading:
+	if _fading:
 		return
 	_update_hud()
 
@@ -299,81 +274,19 @@ func _update_hud() -> void:
 
 # ─── DOORS ───────────────────────────────────────────────────────────────────
 
-func _on_hilo_door_entered(body: Node2D) -> void:
+func _on_wheel_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
-		_fade_out_to("res://scenes/games/hilo/HiLo.tscn")
+		_fade_out_to("res://scenes/games/wheel/Wheel.tscn")
 
 
-func _on_coinflip_door_entered(body: Node2D) -> void:
+func _on_plinko_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
-		_fade_out_to("res://scenes/games/coinflip/CoinFlip.tscn")
+		_fade_out_to("res://scenes/games/plinko/Plinko.tscn")
 
 
-func _on_town2_exit_entered(body: Node2D) -> void:
+func _on_town1_exit_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
-		_fade_out_to(TOWN2_SCENE)
-
-
-# ─── TREE BORDER ─────────────────────────────────────────────────────────────
-
-func _spawn_tree_border() -> void:
-	# Remove any existing border so the button is idempotent
-	var old := find_child("TreeBorder", true, false)
-	if old:
-		old.free()
-
-	var scene_root : Node = get_tree().edited_scene_root if Engine.is_editor_hint() \
-			else null
-
-	var container := Node2D.new()
-	container.name = "TreeBorder"
-	add_child(container)
-	if scene_root:
-		container.owner = scene_root
-
-	const STEP  : int = TILE_SZ        # one tree per tile (32 px)
-	const DEPTH : int = 3              # three trees deep
-	const EDGE  : int = DEPTH * STEP   # 96 px inset for side columns
-
-	# Top 3 rows — full width
-	for d in range(DEPTH):
-		var y : int = d * STEP
-		var x : int = 0
-		while x < WORLD_W:
-			_place_tree(container, Vector2(x, y), scene_root)
-			x += STEP
-
-	# Bottom 3 rows — full width (d=0 is the outermost row, flush with the edge)
-	for d in range(DEPTH):
-		var y : int = WORLD_H - (d + 1) * STEP
-		var x : int = 0
-		while x < WORLD_W:
-			_place_tree(container, Vector2(x, y), scene_root)
-			x += STEP
-
-	# Left 3 cols — interior strip (corners already covered above)
-	for d in range(DEPTH):
-		var x : int = d * STEP
-		var y : int = EDGE
-		while y < WORLD_H - EDGE:
-			_place_tree(container, Vector2(x, y), scene_root)
-			y += STEP
-
-	# Right 3 cols — interior strip
-	for d in range(DEPTH):
-		var x : int = WORLD_W - (d + 1) * STEP
-		var y : int = EDGE
-		while y < WORLD_H - EDGE:
-			_place_tree(container, Vector2(x, y), scene_root)
-			y += STEP
-
-
-func _place_tree(parent: Node2D, pos: Vector2, scene_root: Node) -> void:
-	var t := TREE_SCENE.instantiate()
-	t.position = pos
-	parent.add_child(t)
-	if scene_root:
-		t.owner = scene_root
+		_fade_out_to(TOWN1_SCENE)
 
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
