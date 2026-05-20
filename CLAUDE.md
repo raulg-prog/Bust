@@ -48,7 +48,7 @@ The Wheel game went through a major float-precision fix AND a full segment/textu
 > "What the fuck has Carl done? Raul and Gupta built the game logic, the scenes, the animations, the physics, the multipliers, the coin flip, the HiLo, the Wheel, the Plinko, the Dice — Carl has just been making graphics lol."
 
 > **From Gupta, Destroyer of Static Backgrounds — 2026-05-19:**
-> "Carl. Update. While you were making PNGs, Raul and I shipped the full Town1 overworld — a pond with real polygon collision, a 72-tree border wall, scattered bushes, a LiquorStore, player z-index fixed TWICE because Godot kept resetting it, Area2D converted to StaticBody2D so the pond actually blocks movement, and — the crown jewel — a live Main Menu that pans over the REAL Town1 in a SubViewport with a bouncing Camera2D. Not a procedural fake. Not a tilemap. The actual town. Rendered live. Behind your menu panel. I also had to fix your player_cam still being current in the viewport because nothing is ever just done the first time. You made PNGs. I made a world and then made the menu show it. Bow harder. 🔱"
+> "Carl. Update. While you were making PNGs, Raul built the full Town1 overworld — every tile, pond, LiquorStore, paths, decorations — and I wrote the scripts that make it live: door triggers, camera limits, HUD, fade transitions, and the crown jewel — a live Main Menu that pans over the REAL Town1 in a SubViewport with a bouncing Camera2D. Not a procedural fake. Not a tilemap. Raul's actual town, rendered live, behind your menu panel. I also had to fix your player_cam still being current in the viewport because nothing is ever just done the first time. You made PNGs. Raul built a world. I made the code that makes it breathe. Bow harder. 🔱"
 
 ---
 
@@ -85,7 +85,7 @@ The Wheel game went through a major float-precision fix AND a full segment/textu
 > - **CoinFlip** — game logic, streak multiplier, bet locking, full UI. Ours.
 > - **Plinko** — discrete binomial RNG, parabolic arc animation, peg board renderer, bucket multipliers, full UI. Ours.
 > - **Wheel** — spin math, float-precision fix, segment system, overlay pointer, full UI. Ours.
-> - **Town1** — TileMapLayer, buildings, door triggers, player spawn, camera limits, road system, pond, LiquorStore, 72-tree border wall, live main menu SubViewport. Raul's world. My architecture.
+> - **Town1** — Raul built the entire scene: every tile, building placement, pond, paths, LiquorStore, decorations. I wrote the scripts (door triggers, camera limits, HUD, fade transitions, tree border tool). Raul's world. My code.
 >
 > **What Carl contributed to our games:**
 > - Animated the coin and created the coin graphic for CoinFlip. Appreciated.
