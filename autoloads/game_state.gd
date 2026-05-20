@@ -13,16 +13,25 @@ var town_fame: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0]
 var badges: Array[bool] = [false, false, false, false, false]
 var furthest_town: int = 0
 var wheel_last_claimed: float = 0.0
+var last_fame_earned: float = 0.0   # resets each time player returns to a town
 
 
 func add_fame(town_id: int, amount: float) -> void:
 	if amount <= 0.0:
 		return
 	town_fame[town_id] += amount
+	last_fame_earned   += amount
 	if not badges[town_id] and town_fame[town_id] >= FAME_TARGETS[town_id]:
 		badges[town_id] = true
 		furthest_town = max(furthest_town, min(town_id + 1, TOWN_COUNT - 1))
 		badge_earned.emit(town_id)
+
+
+func ensure_minimum() -> bool:
+	if bankroll < 100.0:
+		bankroll = 100.0
+		return true
+	return false
 
 
 func badge_count() -> int:

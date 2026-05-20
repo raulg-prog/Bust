@@ -29,7 +29,7 @@ const WEIGHTS : Array[int] = [1, 12, 66, 220, 495, 792, 924, 792, 495, 220, 66, 
 func _ready() -> void:
 	randomize()
 	drop_btn.pressed.connect(_on_drop)
-	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/Towns/Town1.tscn"))
+	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://cascade.tscn"))
 	_update_hud()
 
 

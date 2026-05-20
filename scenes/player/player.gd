@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
-const SPEED : float = 120.0
+const SPEED        : float = 150.0
+const SPRINT_SPEED : float = 280.0
 
 enum Dir { DOWN, UP, LEFT, RIGHT }
 
@@ -11,21 +12,27 @@ var _facing : Dir = Dir.DOWN
 
 func _ready() -> void:
 	_play_idle()
+	var cam := find_child("Camera2D", true, false) as Camera2D
+	if cam:
+		cam.position_smoothing_enabled = true
+		cam.position_smoothing_speed   = 8.0
 
 
 func _physics_process(_delta: float) -> void:
+	var spd := SPRINT_SPEED if Input.is_key_pressed(KEY_SHIFT) else SPEED
 	var dir := Vector2(
-		Input.get_axis("ui_left", "ui_right"),
-		Input.get_axis("ui_up",   "ui_down")
+		float(Input.is_key_pressed(KEY_D) or Input.is_action_pressed("ui_right"))
+		- float(Input.is_key_pressed(KEY_A) or Input.is_action_pressed("ui_left")),
+		float(Input.is_key_pressed(KEY_S) or Input.is_action_pressed("ui_down"))
+		- float(Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_up"))
 	)
 	if dir != Vector2.ZERO:
-		# Prefer the dominant axis — no diagonal movement
 		if abs(dir.x) >= abs(dir.y):
 			_facing  = Dir.RIGHT if dir.x > 0.0 else Dir.LEFT
-			velocity = Vector2(sign(dir.x), 0.0) * SPEED
+			velocity = Vector2(sign(dir.x), 0.0) * spd
 		else:
 			_facing  = Dir.DOWN if dir.y > 0.0 else Dir.UP
-			velocity = Vector2(0.0, sign(dir.y)) * SPEED
+			velocity = Vector2(0.0, sign(dir.y)) * spd
 		_play_walk()
 	else:
 		velocity = Vector2.ZERO
@@ -49,6 +56,5 @@ func _play_idle() -> void:
 		Dir.UP:    anim.play("idle up")
 		Dir.RIGHT: anim.play("idle right")
 		Dir.LEFT:
-			# idle left has no frames — mirror idle right
 			anim.flip_h = true
 			anim.play("idle right")

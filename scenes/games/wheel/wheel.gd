@@ -52,7 +52,7 @@ var wheel_exact_rot : float = 0.0   # canonical wheel angle — never read from 
 func _ready() -> void:
 	randomize()
 	spin_btn.pressed.connect(_on_spin)
-	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/Towns/Town1.tscn"))
+	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://cascade.tscn"))
 	# Two frames: nested containers (Center→VBox→Control) need a second pass
 	# before size/position values are finalised.
 	await get_tree().process_frame
