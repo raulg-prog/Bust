@@ -12,14 +12,15 @@ const WHEEL_ORDER : Array[int] = [
 	6, 21, 33, 16, 4, 23, 35, 14, 2
 ]
 
-const CHIP_VALUES : Array[float] = [10.0, 25.0, 50.0, 100.0, 500.0]
-const CHIP_LABELS : Array[String] = ["$10", "$25", "$50", "$100", "$500"]
+const CHIP_VALUES : Array[float] = [1.0, 10.0, 25.0, 50.0, 100.0, 500.0]
+const CHIP_LABELS : Array[String] = ["$1", "$10", "$25", "$50", "$100", "$500"]
 const CHIP_COLORS : Array[Color]  = [
-	Color(0.502, 0.502, 0.502, 1),
-	Color(0.157, 0.502, 0.220, 1),
-	Color(0.659, 0.157, 0.157, 1),
-	Color(0.157, 0.314, 0.659, 1),
-	Color(0.439, 0.157, 0.659, 1),
+	Color(0.973, 0.973, 0.973, 1),  # $1   white
+	Color(0.502, 0.502, 0.502, 1),  # $10  grey
+	Color(0.157, 0.502, 0.220, 1),  # $25  green
+	Color(0.659, 0.157, 0.157, 1),  # $50  red
+	Color(0.157, 0.314, 0.659, 1),  # $100 blue
+	Color(0.439, 0.157, 0.659, 1),  # $500 purple
 ]
 
 const SPIN_REV := 5
@@ -27,7 +28,7 @@ const SPIN_REV := 5
 enum State { IDLE, TRANSITION, SPINNING, SHOW_RESULT, RETURNING }
 
 var state          : State  = State.IDLE
-var selected_chip  : float  = 10.0
+var selected_chip  : float  = 1.0
 var bets           : Dictionary = {}   # bet_key -> float
 var bet_btns       : Dictionary = {}   # bet_key -> Button
 var win_num        : int    = -2       # -2=none, -1=00, 0-36
@@ -49,6 +50,7 @@ var _num_vbox      : Control                      # reference to the number rows
 @onready var show_spin_btn  : Button         = %ShowSpinButton
 @onready var clear_btn      : Button         = %ClearBetsBtn
 @onready var rebet_btn      : Button         = %RebetBtn
+@onready var double_btn     : Button         = %DoubleBtn
 @onready var board_container: VBoxContainer  = %BoardContainer
 @onready var history_row    : HBoxContainer  = %HistoryRow
 @onready var chip_row       : HBoxContainer  = %ChipRow
@@ -80,6 +82,7 @@ func _ready() -> void:
 	show_spin_btn.pressed.connect(_on_show_wheel)
 	clear_btn.pressed.connect(_on_clear_bets)
 	rebet_btn.pressed.connect(_on_rebet)
+	double_btn.pressed.connect(_on_double_bets)
 	%BackButton.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu/MainMenu.tscn"))
 
 	# WheelView starts off-screen below; chip overlay sized to match board
@@ -338,6 +341,7 @@ func _on_bet_placed(key: String) -> void:
 	_refresh_btn_label(key)
 	_update_hud()
 	_update_bet_total()
+	double_btn.disabled = false
 
 
 func _refresh_btn_label(key: String) -> void:
@@ -388,6 +392,7 @@ func _on_clear_bets() -> void:
 	chip_overlay.queue_redraw()
 	_update_hud()
 	_update_bet_total()
+	double_btn.disabled = true
 
 
 func _on_rebet() -> void:
@@ -412,6 +417,25 @@ func _on_rebet() -> void:
 	for key in last_bets:
 		bets[key] = last_bets[key]
 		GameState.bankroll -= last_bets[key]
+		_refresh_btn_label(key)
+	chip_overlay.queue_redraw()
+	_update_hud()
+	_update_bet_total()
+	double_btn.disabled = bets.is_empty()
+
+
+func _on_double_bets() -> void:
+	if state != State.IDLE or bets.is_empty():
+		return
+	var total := 0.0
+	for v in bets.values():
+		total += v
+	if GameState.bankroll < total:
+		bet_total_label.text = "No funds to double"
+		return
+	for key in bets:
+		GameState.bankroll -= bets[key]
+		bets[key] *= 2.0
 		_refresh_btn_label(key)
 	chip_overlay.queue_redraw()
 	_update_hud()
@@ -597,14 +621,16 @@ func _bet_wins(key: String, num: int) -> bool:
 
 
 func _payout_mult(key: String) -> float:
-	if key.begins_with("sp|"): return 17.0   # split  — 2 numbers  17:1
-	if key.begins_with("co|"): return 8.0    # corner — 4 numbers   8:1
+	# True odds — American roulette has 38 pockets (0, 00, 1-36).
+	# Payout = (38 - winning_pockets) / winning_pockets  → zero house edge.
+	if key.begins_with("sp|"): return 18.0          # 2 pockets win  → 36/2  = 18:1
+	if key.begins_with("co|"): return 8.5           # 4 pockets win  → 34/4  = 8.5:1
 	if key == "n_0" or key == "n_00" or key.begins_with("n_"):
-		return 35.0
+		return 37.0                                  # 1 pocket wins  → 37/1  = 37:1
 	match key:
 		"col_1", "col_2", "col_3", "dozen_1", "dozen_2", "dozen_3":
-			return 2.0
-	return 1.0   # even money bets
+			return 26.0 / 12.0                       # 12 pockets win → 26/12 ≈ 2.167:1
+	return 20.0 / 18.0                               # 18 pockets win → 20/18 ≈ 1.111:1
 
 
 # ── Return to board ───────────────────────────────────────────────────────────
@@ -707,6 +733,7 @@ func _set_idle_ui() -> void:
 	show_spin_btn.disabled = false
 	clear_btn.disabled     = false
 	rebet_btn.disabled     = last_bets.is_empty()
+	double_btn.disabled    = bets.is_empty()
 	_lock_board(false)
 
 
@@ -714,6 +741,8 @@ func _lock_board(locked: bool) -> void:
 	for key in bet_btns:
 		(bet_btns[key] as Button).disabled = locked
 	chip_overlay.locked = locked
+	if locked:
+		double_btn.disabled = true
 
 
 func _update_hud() -> void:

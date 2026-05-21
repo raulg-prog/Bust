@@ -12,13 +12,14 @@ const ROW_NUMS : Array[Array] = [
 	[1,4,7,10,13,16,19,22,25,28,31,34],
 ]
 const CHIP_COLORS : Array[Color] = [
+	Color(0.973, 0.973, 0.973, 1),  # $1   white
 	Color(0.502, 0.502, 0.502, 1),  # $10  grey
 	Color(0.157, 0.502, 0.220, 1),  # $25  green
 	Color(0.659, 0.157, 0.157, 1),  # $50  red
 	Color(0.157, 0.314, 0.659, 1),  # $100 blue
 	Color(0.439, 0.157, 0.659, 1),  # $500 purple
 ]
-const CHIP_VALS  : Array[float] = [10.0, 25.0, 50.0, 100.0, 500.0]
+const CHIP_VALS  : Array[float] = [1.0, 10.0, 25.0, 50.0, 100.0, 500.0]
 const THRESH     : float = 9.0   # px from cell edge → treat click as split/corner
 
 var bets   : Dictionary = {}   # shared reference to roulette.gd bets dict
@@ -60,20 +61,34 @@ func _reg_plain(key: String, bmap: Dictionary) -> void:
 	if not bmap.has(key):
 		return
 	var gr := (bmap[key] as Button).get_global_rect()
-	_crects[key] = Rect2(gr.position - global_position, gr.size)
+	_crects[key] = _to_local_rect(gr)
 
 
 func _reg(key: String, bmap: Dictionary, col: int, row: int) -> void:
 	if not bmap.has(key):
 		return
 	var gr := (bmap[key] as Button).get_global_rect()
-	# Convert global button position into the overlay's local space
-	_crects[key] = Rect2(gr.position - global_position, gr.size)
+	_crects[key] = _to_local_rect(gr)
 	_grid[Vector2i(col, row)]  = key
 	_posmap[key]               = Vector2i(col, row)
 
 
+func _to_local_rect(gr: Rect2) -> Rect2:
+	# Convert a global-space Rect2 to overlay local space, snapped to whole
+	# pixels so the highlight draw aligns exactly with the button borders.
+	var lp := (gr.position - global_position).round()
+	var ls := gr.size.round()
+	return Rect2(lp, ls)
+
+
 # ── Input ─────────────────────────────────────────────────────────────────────
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_MOUSE_EXIT:
+		if _hover != "":
+			_hover = ""
+			queue_redraw()
+
 
 func _gui_input(event: InputEvent) -> void:
 	if not _live:
