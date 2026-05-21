@@ -488,17 +488,20 @@ American roulette. Player places chips on the betting board, then spins. Board s
 
 **Red numbers:** `[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]`
 
-**Bet types and payouts (true odds, no house edge):**
-| Bet | Covers | Payout |
+**Bet types and payouts (true odds — 38 pockets, zero house edge):**
+Payout formula: `(38 − winning_pockets) / winning_pockets`
+| Bet | Pockets | Payout multiplier |
 |---|---|---|
-| Straight (n_0, n_00, n_1..n_36) | 1 number | 35:1 |
-| Split (sp\|n_X\|n_Y) | 2 adjacent numbers | 17:1 |
-| Corner (co\|n_A\|n_B\|n_C\|n_D) | 4 numbers at intersection | 8:1 |
-| Column (col_1/2/3) | 12 numbers | 2:1 |
-| Dozen (dozen_1/2/3) | 12 numbers | 2:1 |
-| Red / Black / Odd / Even / Low / High | 18 numbers | 1:1 |
+| Straight (n_0, n_00, n_1..n_36) | 1 | 37:1 |
+| Split (sp\|n_X\|n_Y) | 2 | 18:1 |
+| Corner (co\|n_A\|n_B\|n_C\|n_D) | 4 | 8.5:1 |
+| Column (col_1/2/3) | 12 | 26/12 ≈ 2.167:1 |
+| Dozen (dozen_1/2/3) | 12 | 26/12 ≈ 2.167:1 |
+| Red / Black / Odd / Even / Low / High | 18 | 20/18 ≈ 1.111:1 |
 
-**Chip denominations:** $10, $25, $50, $100, $500 — chip selector in left panel. Multiple bets on different cells allowed simultaneously.
+Note: standard casino rates (35:1, 17:1, 8:1, 2:1, 1:1) carry a ~5.26% house edge and are intentionally NOT used here.
+
+**Chip denominations:** $1, $10, $25, $50, $100, $500 — chip selector in left panel. Multiple bets on different cells allowed simultaneously.
 
 **Board layout (built procedurally in `_build_board()`):**
 - Outer `HBoxContainer` (`_num_vbox`) holds a `zero_vbox` and `num_inner` side by side. Chip overlay is sized to this container.
