@@ -37,9 +37,20 @@ var _btn_place_trees: Callable = _spawn_tree_border
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
+	_setup_camera()
 	_wire_doors()
 	_build_hud()
 	_fade_in()
+
+
+func _setup_camera() -> void:
+	var cam := find_child("Camera2D", true, false) as Camera2D
+	if not cam:
+		return
+	cam.limit_left   = 0
+	cam.limit_top    = 0
+	cam.limit_right  = WORLD_W
+	cam.limit_bottom = WORLD_H
 	if GameState.ensure_minimum():
 		_show_centre_popup("Safety net: $100 added!", COL_YELLOW, 2.5)
 	if GameState.last_fame_earned > 0.0:
