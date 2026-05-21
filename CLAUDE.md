@@ -810,8 +810,8 @@ MainMenu (Control, main_menu.gd)
   - `zero_vbox` holds 0/00 with `SIZE_EXPAND_FILL` vertical — spans full 3-row height, aligns flush with 1st 12 row
   - `num_outer` HBoxContainer is `_num_vbox` (typed `Control`) — chip overlay sized to this, not full board
   - 2:1 column buttons use `mouse_filter = MOUSE_FILTER_IGNORE`; routed via `chip_overlay._reg_plain()`
-- Chip selector ($10/$25/$50/$100/$500); multiple simultaneous bets including split and corner bets
-- Split bets (17:1): click between 2 adjacent number cells. Corner bets (8:1): click intersection of 4 cells (dead-center also works via nearest-cell gap fallback)
+- Chip selector ($1/$10/$25/$50/$100/$500); multiple simultaneous bets including split and corner bets
+- Split bets (18:1): click between 2 adjacent number cells. Corner bets (8.5:1): click intersection of 4 cells (dead-center also works via nearest-cell gap fallback)
 - Chip visuals: chips drawn as layered circles with shadow, bevel ring, white rim, dark center, amount text. Hover highlight and split/corner hint strips on borders
 - Slide animation: board fades to 0.25 opacity, wheel enters upward (0.4s cubic tween); reverses after result
 - 7s spin animation (TRANS_CUBIC EASE_OUT); ball tweens independently
@@ -819,7 +819,7 @@ MainMenu (Control, main_menu.gd)
 - Outside bets (red/black/dozen/etc.) work correctly — overlay sized to number-rows only so outside rows receive input directly
 - History bubbles shown top-right; fixed minimum height prevents layout shift on first spin
 - `chip_overlay.gd`: `mouse_filter = MOUSE_FILTER_PASS` (propagates to parents not siblings — critical architecture note)
-- True odds — 35:1 straight, 17:1 split, 8:1 corner, 2:1 dozens/columns, 1:1 even-money bets
+- True odds — 37:1 straight, 18:1 split, 8.5:1 corner, ≈2.167:1 dozens/columns, ≈1.111:1 even-money bets
 - Multiple GDScript type-inference fixes: typed `Array[String]`, `for num : int in array`, `: StyleBoxFlat =` ternary
 
 ### Next up
