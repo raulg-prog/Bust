@@ -72,6 +72,9 @@ func _wire_doors() -> void:
 	var town2_exit := find_child("EnterCascade", true, false)
 	if town2_exit:
 		town2_exit.body_entered.connect(_on_town2_exit_entered)
+	var cascade_return := find_child("CascadeReturn", true, false)
+	if cascade_return:
+		cascade_return.body_entered.connect(_on_town2_exit_entered)
 
 
 # ─── HUD BUILDER ─────────────────────────────────────────────────────────────

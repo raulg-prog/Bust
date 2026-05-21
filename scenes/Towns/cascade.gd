@@ -1,8 +1,16 @@
+@tool
 extends Node2D
 
 const TOWN_NAME   := "Cascade"
 const TOWN_ID     := 1
 const TOWN1_SCENE := "res://scenes/Towns/Town1.tscn"
+
+const TREE_SCENE  := preload("res://scenes/Towns/Objects/PineTree.tscn")
+const MAP_W       : int = 40
+const MAP_H       : int = 20
+const TILE_SZ     : int = 32
+const WORLD_W     : int = MAP_W * TILE_SZ
+const WORLD_H     : int = MAP_H * TILE_SZ
 
 # GBA colours
 const COL_GOLD   := Color(0.973, 0.847, 0.188, 1)
@@ -22,8 +30,13 @@ var _pause_br_lbl : Label
 var _paused       : bool = false
 var _fading       : bool = false
 
+@export_tool_button("Place Tree Border")
+var _btn_place_trees: Callable = _spawn_tree_border
+
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	_wire_doors()
 	_build_hud()
 	_fade_in()
@@ -287,6 +300,63 @@ func _on_plinko_door_entered(body: Node2D) -> void:
 func _on_town1_exit_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		_fade_out_to(TOWN1_SCENE)
+
+
+# ─── TREE BORDER ─────────────────────────────────────────────────────────────
+
+func _spawn_tree_border() -> void:
+	var old := find_child("TreeBorder", true, false)
+	if old:
+		old.free()
+
+	var scene_root : Node = get_tree().edited_scene_root if Engine.is_editor_hint() \
+			else null
+
+	var container := Node2D.new()
+	container.name = "TreeBorder"
+	add_child(container)
+	if scene_root:
+		container.owner = scene_root
+
+	const STEP  : int = TILE_SZ
+	const DEPTH : int = 3
+	const EDGE  : int = DEPTH * STEP
+
+	for d in range(DEPTH):
+		var y : int = d * STEP
+		var x : int = 0
+		while x < WORLD_W:
+			_place_tree(container, Vector2(x, y), scene_root)
+			x += STEP
+
+	for d in range(DEPTH):
+		var y : int = WORLD_H - (d + 1) * STEP
+		var x : int = 0
+		while x < WORLD_W:
+			_place_tree(container, Vector2(x, y), scene_root)
+			x += STEP
+
+	for d in range(DEPTH):
+		var x : int = d * STEP
+		var y : int = EDGE
+		while y < WORLD_H - EDGE:
+			_place_tree(container, Vector2(x, y), scene_root)
+			y += STEP
+
+	for d in range(DEPTH):
+		var x : int = WORLD_W - (d + 1) * STEP
+		var y : int = EDGE
+		while y < WORLD_H - EDGE:
+			_place_tree(container, Vector2(x, y), scene_root)
+			y += STEP
+
+
+func _place_tree(parent: Node2D, pos: Vector2, scene_root: Node) -> void:
+	var t := TREE_SCENE.instantiate()
+	t.position = pos
+	parent.add_child(t)
+	if scene_root:
+		t.owner = scene_root
 
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
