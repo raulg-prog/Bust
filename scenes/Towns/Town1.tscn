@@ -54,10 +54,15 @@ position = Vector2(688, 616)
 [node name="HiLoBuild" parent="." unique_id=1132206200 instance=ExtResource("4_hilobuild")]
 position = Vector2(936, 320)
 
-[node name="GeminiGeneratedImageYn4Ct7Yn4Ct7Yn4cRemovebgPreview" type="Sprite2D" parent="." unique_id=1116177672]
+[node name="Pond" type="Sprite2D" parent="." unique_id=1116177672]
 position = Vector2(584, 368)
 scale = Vector2(0.35934064, 0.35934067)
 texture = ExtResource("6_uexc1")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Pond" unique_id=2147332850]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Pond/StaticBody2D" unique_id=226684610]
+polygon = PackedVector2Array(-44.526, -133.57794, 22.263062, -133.57794, 44.526, -111.31494, 66.78894, -133.57794, 111.31506, -133.57794, 133.578, -133.57794, 155.84094, -89.05194, 178.104, -89.05194, 178.104, 89.052, 178.104, 111.31506, -155.84094, 111.31506, -178.104, 0, -155.84094, -22.26294, -133.578, -89.05194, -44.526, -111.31494)
 
 [node name="CoinFlipBuild" parent="." unique_id=1326361399 instance=ExtResource("5_coinflipbuild")]
 position = Vector2(360, 288)

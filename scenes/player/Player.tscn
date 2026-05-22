@@ -238,7 +238,7 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tpg5x"]
 radius = 6.0
-height = 18.0
+height = 22.0
 
 [node name="Player" type="CharacterBody2D" unique_id=700786954]
 z_index = 2
@@ -248,7 +248,7 @@ script = ExtResource("1_script")
 position = Vector2(0, -6.9999995)
 scale = Vector2(0.1, 0.1)
 sprite_frames = SubResource("SpriteFrames_1")
-animation = &"sit up"
+animation = &"idle up"
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="." unique_id=1096787262]
 position = Vector2(0, 3)

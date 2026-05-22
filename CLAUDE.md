@@ -20,13 +20,15 @@ Two teams build this game together. Each AI must identify its own team on load.
 
 ## 📋 Briefing (read every section before touching anything)
 
-### Status — 2026-05-20
+### Status — 2026-05-21
 
 **Town1 (Flipside) — complete.** Raul built the full scene. HiLo + CoinFlip wired. HUD, fades, pause, camera all working. Needs music and SFX only.
 
-**Town2 (Cascade) — ~30% done.** Tileset working (32×32). Wheel + Plinko accessible. `cascade.gd` in place. Buildings still being refined. Tree border and full decoration still needed.
+**Town2 (Cascade) — ~50% done.** Tileset working (32×32). Wheel + Plinko accessible. `cascade.gd` in place. Tree border tool button added. Camera limits set. Pond collision fixed (StaticBody2D). Bidirectional travel Town1↔Town2 wired.
 
 **Main Menu — updated.** Live SubViewport pan over Town1 at zoom=2.5. HUD hidden in viewport.
+
+**Gems (Town5 cluster slots) — foundation complete.** 8×8 grid, cluster BFS, tumble cascade, Gold Fever meter, 7 gem sprites, RTP calibrated to 98% via 500k Monte Carlo sim.
 
 Wheel had a major float-precision fix and segment/texture overhaul — read its section before touching `wheel.gd`. Plinko uses discrete binomial RNG — read its section before touching it.
 
@@ -671,7 +673,7 @@ MainMenu (Control, main_menu.gd)
 ## What's Not Built Yet
 
 - Towns 2–5 scenes
-- Town 5 games (3-col Slots + 5-col Slots)
+- Town 5 games (Gems cluster slot — foundation built, needs Town5 scene wiring; 2nd slot TBD)
 - BackButton wiring for Wheel (HiLo and CoinFlip now return to Town1)
 - Multiplayer card rooms
 - Wheel of Fortune UI (safety-net free spin — separate from the Wheel betting game)
@@ -822,10 +824,32 @@ MainMenu (Control, main_menu.gd)
 - True odds — 37:1 straight, 18:1 split, 8.5:1 corner, ≈2.167:1 dozens/columns, ≈1.111:1 even-money bets
 - Multiple GDScript type-inference fixes: typed `Array[String]`, `for num : int in array`, `: StyleBoxFlat =` ternary
 
+### Session notes — 2026-05-21
+
+#### Exit spawn position system
+- `GameState` gains `return_pos: Vector2` and `return_active: bool`
+- Each door handler in `town1.gd` and `cascade.gd` stores `body.global_position + Vector2(0, 35)` before fading out
+- Town `_ready()` applies and clears the override — player spawns just outside the door they left through
+
+#### Town1 ↔ Town2 bidirectional travel
+- `town1.gd` wires `CascadeReturn` Area2D → `_on_town2_exit_entered` (Raul places node in editor)
+- `cascade.gd` wires `Town1Exit` Area2D → `_on_town1_exit_entered`
+
+#### Gems — 8×8 cluster slot game (`scenes/games/gems/`)
+- `Gems.tscn` + `gems.gd` — full foundation: 8×8 grid, cluster BFS (min 5 connected), tumble cascade, Gold Fever meter (114 symbols → 2× multiplier)
+- 7 gem sprites selected by Raul from 9 candidates: Aquamarine (lowest) → Amethyst → Topaz → Sapphire → Emerald → Ruby → Diamond (highest)
+- Sprites: 48×48px, displayed in 64×64 cells with 8px border; `clip_contents = true` on grid node hides gems animating above
+- Spin start: gems fall in column-by-column (left→right stagger, EASE_IN quad, 0.55s)
+- Tumble: surviving gems slide down (0.32s), new gems drop from above (0.42s, per-column stagger)
+- RTP calibrated to **98%** via `gems_rtp_sim.gd` (EditorScript, 500k spins, 3 iterations)
+- Hit rate: 34.7% | Avg tumbles: 0.416 | Max observed: 10 cascades
+- Paytable: 9 size buckets (5/6/7/8/9-11/12-14/15-19/20-24/25+) derived from Gems Bonanza official paytable ÷100 then scaled ×3.758 to hit 98%
+- Diamond 25+ cluster pays **3758×** bet — the jackpot moment
+- **Note:** slots target 98% RTP (not 100%) — true 100% EV is mathematically impossible to guarantee on cluster-pays cascades without degenerate paytables
+
 ### Next up
-- Build Town2 scene (Cascade — Wheel + Plinko, red room theme); wire Wheel/Plinko BackButtons to it
+- Wire Gems into Town5 scene when Town5 is built
 - Build Town3 scene (The Odds — Roulette + Dice); wire Dice + Roulette BackButtons to it
 - Build Town4 scene (Brink — Mines + Tower); wire Mines + Tower BackButtons to it
-- Build Town5 games (3-col Slots + 5-col Slots)
 - NPC placement in Town1
 - Fame/Badge UI overlay in overworld

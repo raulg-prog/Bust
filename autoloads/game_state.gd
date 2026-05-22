@@ -15,6 +15,9 @@ var furthest_town: int = 0
 var wheel_last_claimed: float = 0.0
 var last_fame_earned: float = 0.0   # resets each time player returns to a town
 
+var return_pos: Vector2    = Vector2.ZERO
+var return_active: bool    = false
+
 
 func add_fame(town_id: int, amount: float) -> void:
 	if amount <= 0.0:
@@ -73,3 +76,5 @@ func reset() -> void:
 	badges = [false, false, false, false, false]
 	furthest_town = 0
 	wheel_last_claimed = 0.0
+	return_pos    = Vector2.ZERO
+	return_active = false

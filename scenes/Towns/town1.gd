@@ -40,6 +40,9 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	_player = find_child("Player", true, false)
+	if _player and GameState.return_active:
+		_player.position       = GameState.return_pos
+		GameState.return_active = false
 	_setup_camera()
 	_wire_doors()
 	_build_hud()
@@ -304,11 +307,15 @@ func _update_hud() -> void:
 
 func _on_hilo_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		GameState.return_pos    = body.global_position + Vector2(0, 35)
+		GameState.return_active = true
 		_fade_out_to("res://scenes/games/hilo/HiLo.tscn")
 
 
 func _on_coinflip_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		GameState.return_pos    = body.global_position + Vector2(0, 35)
+		GameState.return_active = true
 		_fade_out_to("res://scenes/games/coinflip/CoinFlip.tscn")
 
 

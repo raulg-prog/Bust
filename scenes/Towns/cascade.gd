@@ -37,6 +37,10 @@ var _btn_place_trees: Callable = _spawn_tree_border
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
+	var player := find_child("Player", true, false)
+	if player and GameState.return_active:
+		player.position        = GameState.return_pos
+		GameState.return_active = false
 	_setup_camera()
 	_wire_doors()
 	_build_hud()
@@ -300,11 +304,15 @@ func _update_hud() -> void:
 
 func _on_wheel_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		GameState.return_pos    = body.global_position + Vector2(0, 35)
+		GameState.return_active = true
 		_fade_out_to("res://scenes/games/wheel/Wheel.tscn")
 
 
 func _on_plinko_door_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		GameState.return_pos    = body.global_position + Vector2(0, 35)
+		GameState.return_active = true
 		_fade_out_to("res://scenes/games/plinko/Plinko.tscn")
 
 
