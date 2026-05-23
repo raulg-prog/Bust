@@ -1,60 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://da4yhp78avgp4"]
 
-[ext_resource type="Script" path="res://scenes/main_menu/main_menu.gd" id="1_menu"]
-[ext_resource type="Script" path="res://scenes/main_menu/main_menu_bg.gd" id="2_bg"]
+[ext_resource type="Script" uid="uid://bq23lrshucj23" path="res://scenes/main_menu/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://boj14jjimcw2p" path="res://scenes/main_menu/main_menu_bg.gd" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://ctyc7n40iycxd" path="res://Assets/Logo/UpperCase.png" id="3_logo"]
+[ext_resource type="FontFile" uid="uid://dhg87kcwwamjs" path="res://Assets/Fonts/m5x7.ttf" id="4_qmweu"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.031, 0.031, 0.094, 0.90)
-border_color = Color(0.314, 0.220, 0.565, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-content_margin_left = 32.0
-content_margin_top = 28.0
-content_margin_right = 32.0
-content_margin_bottom = 32.0
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_divider"]
-bg_color = Color(0.314, 0.220, 0.565, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.063, 0.031, 0.157, 1)
-border_color = Color(0.314, 0.220, 0.565, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.125, 0.094, 0.220, 1)
-border_color = Color(0.973, 0.847, 0.188, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.188, 0.125, 0.345, 1)
-border_color = Color(0.973, 0.847, 0.188, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
-
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=482940884]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,7 +16,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" type="Control" parent="."]
+[node name="Background" type="Control" parent="." unique_id=2072319042]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,7 +26,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_bg")
 
-[node name="DarkOverlay" type="ColorRect" parent="."]
+[node name="DarkOverlay" type="ColorRect" parent="." unique_id=338299364]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -81,88 +34,66 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.0, 0.0, 0.0, 0.28)
+color = Color(0, 0, 0, 0.40784314)
+metadata/_edit_lock_ = true
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Logo" type="TextureRect" parent="." unique_id=468135426]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -166.0
+offset_right = 250.0
+offset_bottom = 14.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_logo")
+stretch_mode = 5
 
-[node name="MenuPanel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="VBox" type="VBoxContainer" parent="Center/MenuPanel"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="TitleLabel" type="Label" parent="Center/MenuPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_font_sizes/font_size = 60
-text = "BUST"
-horizontal_alignment = 1
-
-[node name="SubLabel" type="Label" parent="Center/MenuPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.627, 0.627, 0.753, 1)
-theme_override_font_sizes/font_size = 15
-text = "A Gambling Adventure"
-horizontal_alignment = 1
-
-[node name="Divider" type="PanelContainer" parent="Center/MenuPanel/VBox"]
-custom_minimum_size = Vector2(0, 2)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_divider")
-
-[node name="Spacer" type="Control" parent="Center/MenuPanel/VBox"]
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-
-[node name="NewGameButton" type="Button" parent="Center/MenuPanel/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.878, 0.878, 0.973, 1)
-theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/focus = SubResource("StyleBoxFlat_btn_normal")
-text = "New Game"
-
-[node name="QuitButton" type="Button" parent="Center/MenuPanel/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.878, 0.878, 0.973, 1)
-theme_override_colors/font_hover_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-theme_override_styles/focus = SubResource("StyleBoxFlat_btn_normal")
-text = "Quit"
-
-[node name="VersionLabel" type="Label" parent="."]
+[node name="ButtonsVBox" type="VBoxContainer" parent="." unique_id=838576426]
 layout_mode = 1
 anchors_preset = 4
-anchor_left = 0.0
-anchor_top = 1.0
-anchor_right = 0.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -26.0
-offset_right = 200.0
-offset_bottom = -6.0
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.502, 0.502, 0.596, 0.7)
-theme_override_font_sizes/font_size = 13
-text = "v0.1 — Early Development"
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 33.0
+offset_top = 106.0
+offset_right = 273.0
+offset_bottom = 246.0
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="PlayButton" type="Button" parent="ButtonsVBox" unique_id=1977017558]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.627, 0.627, 0.627, 1)
+theme_override_colors/font_focus_color = Color(0.627, 0.627, 0.627, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_fonts/font = ExtResource("4_qmweu")
+theme_override_font_sizes/font_size = 58
+theme_override_styles/normal = SubResource("StyleBoxEmpty_1")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_1")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_1")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1")
+text = "Play"
+
+[node name="ExitButton" type="Button" parent="ButtonsVBox" unique_id=1485701325]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.627, 0.627, 0.627, 1)
+theme_override_colors/font_focus_color = Color(0.627, 0.627, 0.627, 1)
+theme_override_colors/font_pressed_color = Color(0.973, 0.847, 0.188, 1)
+theme_override_colors/font_hover_color = Color(0.973, 0.973, 0.973, 1)
+theme_override_fonts/font = ExtResource("4_qmweu")
+theme_override_font_sizes/font_size = 58
+theme_override_styles/normal = SubResource("StyleBoxEmpty_1")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_1")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_1")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1")
+text = "Exit"
