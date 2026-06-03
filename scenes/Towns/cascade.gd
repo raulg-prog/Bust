@@ -29,6 +29,7 @@ var _pause_panel  : Panel
 var _pause_br_lbl : Label
 var _paused       : bool = false
 var _fading       : bool = false
+var _town1_exit_armed : bool = false
 
 @export_tool_button("Place Tree Border")
 var _btn_place_trees: Callable = _spawn_tree_border
@@ -75,6 +76,7 @@ func _wire_doors() -> void:
 	var town1_exit := find_child("Town1Exit", true, false)
 	if town1_exit:
 		town1_exit.body_entered.connect(_on_town1_exit_entered)
+		town1_exit.body_exited.connect(_on_town1_exit_exited)
 
 
 # ─── HUD BUILDER ─────────────────────────────────────────────────────────────
@@ -316,8 +318,13 @@ func _on_plinko_door_entered(body: Node2D) -> void:
 		_fade_out_to("res://scenes/games/plinko/Plinko.tscn")
 
 
-func _on_town1_exit_entered(body: Node2D) -> void:
+func _on_town1_exit_exited(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		_town1_exit_armed = true
+
+
+func _on_town1_exit_entered(body: Node2D) -> void:
+	if body is CharacterBody2D and _town1_exit_armed:
 		_fade_out_to(TOWN1_SCENE)
 
 

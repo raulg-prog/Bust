@@ -52,6 +52,9 @@ size = Vector2(32, 41)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_plinko"]
 size = Vector2(32, 36.5)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_town1exit"]
+size = Vector2(120, 72)
+
 [node name="Cascade" type="Node2D" unique_id=482986226]
 script = ExtResource("0_cascade")
 
@@ -101,6 +104,12 @@ position = Vector2(749, 724)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlinkoDoor" unique_id=100000004]
 position = Vector2(-285, -342.25)
 shape = SubResource("RectangleShape2D_plinko")
+
+[node name="Town1Exit" type="Area2D" parent="."]
+position = Vector2(-30, 416)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Town1Exit"]
+shape = SubResource("RectangleShape2D_town1exit")
 
 [node name="TreeBorder" type="Node2D" parent="." unique_id=1656115712]
 

@@ -4,7 +4,7 @@ signal badge_earned(town_id: int)
 
 const STARTING_BANKROLL := 1000.0
 const TOWN_COUNT := 5
-const FAME_TARGETS: Array[float] = [5000.0, 25000.0, 100000.0, 400000.0, 1500000.0]
+const FAME_TARGETS: Array[float] = [2000.0, 10000.0, 40000.0, 160000.0, 600000.0]
 const WHEEL_BASE: Array[float] = [200.0, 1000.0, 5000.0, 25000.0, 100000.0]
 const WHEEL_COOLDOWN := 14400.0  # 4 hours in seconds
 
