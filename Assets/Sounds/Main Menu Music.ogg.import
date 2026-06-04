@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bifth580ynegu"
+path="res://.godot/imported/Main Menu Music.ogg-e6d440cf63bb00f06b3cfb55216aa924.oggvorbisstr"
+
+[deps]
+
+source_file="res://Assets/Sounds/Main Menu Music.ogg"
+dest_files=["res://.godot/imported/Main Menu Music.ogg-e6d440cf63bb00f06b3cfb55216aa924.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

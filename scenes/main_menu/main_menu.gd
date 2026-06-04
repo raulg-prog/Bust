@@ -12,12 +12,18 @@ const OPTIONS := "res://scenes/menus/Options.tscn"
 @onready var _confirm     : Control     = %ConfirmGroup
 @onready var _yes_btn     : Button      = %YesButton
 @onready var _no_btn      : Button      = %NoButton
-@onready var _fade        : ColorRect   = $FadeRect
+@onready var _fade        : ColorRect        = $FadeRect
+@onready var _music       : AudioStreamPlayer = %MusicPlayer
 
-var _leaving    : bool = false
-var _confirming : bool = false
-var _menu_btns  : Array[Button]  = []
-var _btn_home   : Array[Vector2] = []
+const MUSIC_VOL_DB  : float = -9.6   # ~50% amplitude, then another 30% quieter
+const FADE_OUT_TIME : float = 2.5    # seconds before end to begin fade out
+const FADE_IN_TIME  : float = 1.5    # fade in duration on loop restart
+
+var _leaving     : bool = false
+var _confirming  : bool = false
+var _fading_out  : bool = false
+var _menu_btns   : Array[Button]  = []
+var _btn_home    : Array[Vector2] = []
 
 
 func _ready() -> void:
@@ -36,6 +42,8 @@ func _ready() -> void:
 		_wire_hover(b)
 	_wire_grow(_yes_btn)
 	_wire_grow(_no_btn)
+	_music.finished.connect(_on_music_finished)
+	_start_music()
 
 
 func _wire_hover(btn: Button) -> void:
@@ -126,3 +134,27 @@ func _on_yes() -> void:
 	var tw := create_tween()
 	tw.tween_property(_fade, "color:a", 1.0, 0.4)
 	tw.tween_callback(func(): get_tree().quit())
+
+
+# ── Music ─────────────────────────────────────────────────────────────────────
+
+func _start_music() -> void:
+	_fading_out = false
+	_music.volume_db = -80.0
+	_music.play()
+	var tw := create_tween()
+	tw.tween_property(_music, "volume_db", MUSIC_VOL_DB, FADE_IN_TIME)
+
+
+func _process(_delta: float) -> void:
+	if not _music.playing or _fading_out:
+		return
+	var remaining := _music.stream.get_length() - _music.get_playback_position()
+	if remaining <= FADE_OUT_TIME:
+		_fading_out = true
+		var tw := create_tween()
+		tw.tween_property(_music, "volume_db", -80.0, remaining)
+
+
+func _on_music_finished() -> void:
+	_start_music()

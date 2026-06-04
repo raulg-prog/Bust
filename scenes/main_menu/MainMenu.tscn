@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://boj14jjimcw2p" path="res://scenes/main_menu/main_menu_bg.gd" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://ctyc7n40iycxd" path="res://Assets/Logo/UpperCase.png" id="3_logo"]
 [ext_resource type="FontFile" uid="uid://dhg87kcwwamjs" path="res://Assets/Fonts/m5x7.ttf" id="4_qmweu"]
+[ext_resource type="AudioStream" path="res://Assets/sounds/Main Menu Music.ogg" id="5_music"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1"]
 
@@ -228,6 +229,12 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_1")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_1")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_1")
 text = "No"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("5_music")
+volume_db = -80.0
+autoplay = false
 
 [node name="FadeRect" type="ColorRect" parent="." unique_id=1620524705]
 layout_mode = 1

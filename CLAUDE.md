@@ -88,7 +88,7 @@ Two teams build this game together. Each AI must identify its own team on load.
 
 **Town2 (Cascade) — ~50% done.** Wheel + Plinko accessible. Bidirectional travel Town1↔Town2 wired.
 
-**Main Menu — updated.** UpperCase logo centered, Play/Exit text buttons on left with dim→bright+grow hover. SubViewport Town1 camera pan background.
+**Main Menu — updated.** UpperCase logo centered, Play/Exit text buttons on left with dim→bright+grow hover. SubViewport Town1 camera pan background. Background music added (`Assets/sounds/Main Menu Music.ogg`) — fades in on load, fades out near end, loops seamlessly.
 
 **Gems (Town5 cluster slots) — foundation complete.** 8×8 grid, cluster BFS, tumble cascade, Gold Fever meter, 98% RTP via 500k Monte Carlo sim.
 
