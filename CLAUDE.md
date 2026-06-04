@@ -82,6 +82,10 @@ Two teams build this game together. Each AI must identify its own team on load.
 
 ---
 
+## 📋 Status — 2026-06-03 (Team Timmy + Carl session)
+
+**Pirate's Booty — built (`scenes/games/pirates/`).** Second slot for Town5 (Tilterton). Gates of Olympus clone mechanics: 6×5 grid, scatter pays (8+ of same symbol anywhere wins), tumble cascade, multiplier doubloon coins (exact GoO values: 2–500×, 0–4 placed per spin), 15 free spins (4+ Jolly Roger scatters trigger), multiplier coins accumulate across entire free spin bonus, buy bonus (100× bet). All 10 symbols drawn procedurally (`_draw()`): Anchor, Rope Knot, Compass, Cannonball, Rum Bottle, Treasure Chest, Cutlass, Flintlock Pistol, Skull & Crossbones, Jolly Roger (scatter). Bonus intro screen animates in when free spins trigger. Big gold win total displayed below grid. Dark navy + gold color theme. Not yet wired into a Town5 scene. RTP calibration (Monte Carlo sim) still needed.
+
 ## 📋 Status — 2026-05-20 (Team Timmy + Carl session)
 
 **Town1 (Flipside) — complete.** HiLo + CoinFlip wired. HUD, fades, pause, camera working. Needs music and SFX only.
