@@ -82,13 +82,15 @@ Two teams build this game together. Each AI must identify its own team on load.
 
 ---
 
-## 📋 Status — 2026-05-22
+## 📋 Status — 2026-05-20 (Team Timmy + Carl session)
 
 **Town1 (Flipside) — complete.** HiLo + CoinFlip wired. HUD, fades, pause, camera working. Needs music and SFX only.
 
 **Town2 (Cascade) — ~50% done.** Wheel + Plinko accessible. Bidirectional travel Town1↔Town2 wired.
 
-**Main Menu — updated.** UpperCase logo centered, Play/Exit text buttons on left with dim→bright+grow hover. SubViewport Town1 camera pan background. Background music added (`Assets/sounds/Main Menu Music.ogg`) — fades in on load, fades out near end, loops seamlessly.
+**Main Menu — updated.** UpperCase logo centered, Play/Exit text buttons on left with dim→bright+grow hover. SubViewport Town1 camera pan background. Background music added (`Assets/Sounds/Main Menu Music.ogg`) — fades in on load (-80→-9.6 dB over 1.5s), watches playback position and fades out 2.5s before end, restarts with fade-in for seamless loop. `MusicPlayer` AudioStreamPlayer node in `MainMenu.tscn`, logic in `main_menu.gd` (`_start_music`, `_process`, `_on_music_finished`).
+
+**Roulette — polished (Team Timmy + Carl).** $1 chip added. Double bets (×2) button added next to ↺ rebet. Chip overlay hover highlight now clears on mouse exit (`NOTIFICATION_MOUSE_EXIT`) and snaps to pixel boundaries (`_to_local_rect` with `.round()`). True-odds payouts: 37:1 straight, 18:1 split, 8.5:1 corner, ≈2.167:1 dozens/columns, ≈1.111:1 even-money. `.claude/settings.json` created with blanket allow rules — no more permission prompts.
 
 **Gems (Town5 cluster slots) — foundation complete.** 8×8 grid, cluster BFS, tumble cascade, Gold Fever meter, 98% RTP via 500k Monte Carlo sim.
 
