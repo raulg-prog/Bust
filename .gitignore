@@ -2,6 +2,10 @@
 .godot/
 /android/
 
-# Claude Code session files (keep shared skills, ignore the rest)
+# Claude Code session files (keep shared skills + rules, ignore the rest)
 .claude/*
 !.claude/skills/
+!.claude/rules/
+
+# Machine-local Claude context (per-developer, never shared)
+CLAUDE.local.md

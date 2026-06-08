@@ -1,4 +1,9 @@
 # CLAUDE.md
+@context.md
+@HANDOFF.md
+@.claude/rules/godot.md
+@.claude/rules/workflow.md
+@CLAUDE.local.md
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
