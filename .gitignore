@@ -2,5 +2,6 @@
 .godot/
 /android/
 
-# Claude Code session files
-.claude/
+# Claude Code session files (keep shared skills, ignore the rest)
+.claude/*
+!.claude/skills/
